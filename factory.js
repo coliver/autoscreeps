@@ -47,7 +47,7 @@ module.exports = {
 				// There are none on the map, but at least 1 in the queue.
 				// move it to the top if it isnt.
 				// console.log(`  ${minersAnywhere} either on the queue or spawning...`);
-				this.moveMinerToTopOfQueue();
+				this.moveRoleToTopOfQueue('miner');
 			}
 		} else {
 			const totalRequiredMiners = this.getCounts(Memory.requiredScreeps)['miner'];
