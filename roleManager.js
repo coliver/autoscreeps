@@ -1,5 +1,5 @@
 module.exports = {
-  roleExists: (role) => {
+  roleExists(role) {
     // console.log("roleManager.roleExists")
     try {
       require("roles_" + role);
@@ -13,7 +13,7 @@ module.exports = {
     }
   },
 
-  getRole: (role) => {
+  getRole(role) {
     // console.log("roleManager.getRole")
     if (!this.roleExists(role)) {
       return false;
@@ -26,7 +26,7 @@ module.exports = {
     return roleObject;
   },
 
-  getRoleBodyParts: (role) => {
+  getRoleBodyParts(role) {
     // console.log("roleManager.getRoleBodyParts")
     if (!this.roleExists(role)) {
       return false;

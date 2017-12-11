@@ -1,10 +1,9 @@
-// This guys does the other half of energy collection. The miner gets it from
-// the source, and the helper does the transportation. We don't want them just
-// going for the nearest source, as that means that if we have more than one
-// miner, all the helpers will only go for the first miner. To counter this,
-// we assign them to a miner the same way we assign a miner to a source
+// This guys does the other half of energy collection. The miner gets it from the source, and the
+// helper does the transportation. We don't want them just going for the nearest source, as that
+// means that if we have more than one miner, all the helpers will only go for the first miner. To
+// counter this, we assign them to a miner the same way we assign a miner to a source
 
-// var helper = {
+// const helper = {
 module.exports = {
   parts: [
     [MOVE, CARRY, MOVE, CARRY],
@@ -17,18 +16,13 @@ module.exports = {
 
     const miner = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
       filter(dude) {
-        if (dude.memory.role === 'miner'
-        && dude.memory.helpers.length < dude.memory.helpersNeeded) {
-          return true;
-        }
+        if (dude.memory.role === 'miner' && dude.memory.helpers.length < dude.memory.helpersNeeded) { return true; }
 
         return false;
       },
     });
 
-    if (miner === undefined) {
-      return;
-    }
+    if (miner === undefined) { return; }
 
     creep.memory.miner = miner.id;
     miner.memory.helpers.push(creep.id);
@@ -136,7 +130,6 @@ module.exports = {
         creep.drop(RESOURCE_ENERGY);
       }
     } else {
-      // Let's do the moving
       // console.log(`  moving to ${target.name}`);
       creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
     }
@@ -144,7 +137,7 @@ module.exports = {
 
   findATarget() {
     // console.log(`  findATarget`)
-    const creep = this.creep;
+    const { creep } = this;
     let target = null;
 
     const spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
@@ -161,14 +154,14 @@ module.exports = {
       return target;
     }
 
-    target = this.checkContainers(creep.pos);
+    target = this.checkContainers(creep.room);
     // STRUCTURE_CONTAINERs
     if (target) {
       // console.log(`  container wins: (${target})`)
       return target;
     }
 
-    target = this.checkStorage(creep.pos);
+    target = this.checkStorage(creep.room);
     if (target) {
       // console.log(`  storage wins: (${target})`)
       return target;
@@ -178,10 +171,10 @@ module.exports = {
     return spawn;
   },
 
-  checkExtensions(room): null | StructureExtension {
+  checkExtensions(room) {
     // console.log(`    checkExtensions(${spawn})`)
     let target = null;
-    if (room == null) {
+    if (room === undefined) {
       return;
     }
 
@@ -190,41 +183,46 @@ module.exports = {
       filter: { structureType: STRUCTURE_EXTENSION },
     });
 
-    extensions.map((extension) => {
-      if (extension.isActive() && extension.energy < extension.energyCapacity) {
+    extensions.forEach((ext) => {
+      if (ext.isActive() && (ext.energy < ext.energyCapacity)) {
         // console.log(`  assigning ${ext} as target`)
-        target = extension;
-        return target;
+        target = ext;
+        return;
       }
-      return null;
     });
-
     return target;
   },
 
-  checkContainers(pos) {
+  checkContainers(room) {
     // console.log(`    checkContainers(${room})`);
-    return this.getClosestStorageTypeThing(STRUCTURE_CONTAINER, pos);
+    return this.checkStorageTypeThing(STRUCTURE_CONTAINER, room);
   },
 
-  checkStorage(pos) {
+  checkStorage(room) {
     // console.log(`    checkStorage(${room})`);
-    return this.getClosestStorageTypeThing(STRUCTURE_STORAGE, pos);
+    return this.checkStorageTypeThing(STRUCTURE_STORAGE, room);
   },
 
   // Type can be STRUCTURE_CONTAINER or STRUCTURE_STORAGE
-  getClosestStorageTypeThing(type, pos): null | Structure {
-    // console.log(`      getClosestStorageTypeThing(${type})`)
-    const target = pos.findClosestByRange(FIND_STRUCTURES, {
-      filter: (structure) => {
-        return structure.structureType === type && structure.isActive() && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
-      },
+  checkStorageTypeThing(type, room) {
+    // console.log(`      checkStorageTypeThing(${type})`)
+    let target = null;
+    const thingies = room.find(FIND_STRUCTURES, {
+      filter: { structureType: type },
     });
+
+    for (const i in thingies) {
+      const thing = thingies[i];
+      // console.log(`  container: ${thing}`);
+      if (thing.isActive() && thing.store[RESOURCE_ENERGY] < thing.storeCapacity) {
+        target = thing;
+        break;
+      }
+    }
     // console.log(`  ${target}`)
     return target;
   },
 
-  // TODO: Check towers
   checkTowers(room) {
     // console.log(`  checkTowers(${room})`);
     const towers = room.find(FIND_MY_STRUCTURES, {

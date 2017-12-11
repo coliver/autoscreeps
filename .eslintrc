@@ -8,8 +8,27 @@
     "mocha": true
   },
   "globals": {
-    "Game": true,
-    "Structure": true
+    "Creep": false,
+    "Game": false,
+    "Structure": false,
+    "StructureContainer": false,
+    "StructureExtension": false,
+    "StructureStorage": false,
+    "MOVE": false,
+    "CARRY": false,
+    "FIND_MY_CREEPS": false,
+    "_": false,
+    "FIND_DROPPED_RESOURCES": false,
+    "FIND_MY_CONSTRUCTION_SITES": false,
+    "FIND_MY_SPAWNS": false,
+    "FIND_MY_STRUCTURES": false,
+    "FIND_STRUCTURES": false,
+    "RESOURCE_ENERGY": false,
+    "STRUCTURE_CONTAINER": false,
+    "STRUCTURE_EXTENSION": false,
+    "STRUCTURE_STORAGE": false,
+    "STRUCTURE_WALL": false,
+    "WORK": false,
   },
   "rules": {
     "valid-jsdoc": ["error", {
