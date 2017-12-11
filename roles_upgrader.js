@@ -39,25 +39,25 @@ module.exports = {
       // TODO: FINISH THIS
       // STRUCTURE_CONTAINERs
       let target = null
-			// console.log("  checking containers...");
+      // console.log("  checking containers...");
 
       // TODO: You can simplify the code below.
-			const containers = creep.room.find(FIND_STRUCTURES, {
-											   filter: { structureType: STRUCTURE_CONTAINER }
-											 });
+      const containers = creep.room.find(FIND_STRUCTURES, {
+                         filter: { structureType: STRUCTURE_CONTAINER }
+                       });
 
-			// console.log(`${containers}`);
+      // console.log(`${containers}`);
 
-			for(let i in containers) {
-				let container = containers[i];
-				// console.log(`container: ${container}`);
+      for(let i in containers) {
+        let container = containers[i];
+        // console.log(`container: ${container}`);
 
-				if (container.isActive() && container.store[RESOURCE_ENERGY]  > 0) {
+        if (container.isActive() && container.store[RESOURCE_ENERGY]  > 0) {
           // console.log(`${container}`)
-					target = container;
-					break
-				}
-			}
+          target = container;
+          break
+        }
+      }
 
       if (target) {
         if(creep.pos.isNearTo(target)) {

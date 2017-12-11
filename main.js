@@ -4,17 +4,20 @@ const spawner = require('spawner');
 
 const WALL_REPAIR_MAX = 10000;
 
-module.exports.loop = function () {
+module.exports.loop = () => {
   // cleanup dead Screeps
-  for (const i in Memory.creeps) {
-    if (!Game.creeps[i]) {
-      delete Memory.creeps[i];
+  Object.keys(Memory.creeps).forEach((key) => {
+    if (!Game.creeps[key]) {
+      delete Memory.creeps[key];
     }
-  }
+  });
 
   // MAIN
-  factory.init();
-  factory.run();
+  Object.keys(Game.rooms).forEach((key) => {
+    factory.theRoom = Game.rooms[key];
+    factory.init();
+    factory.run();
+  });
 
   spawner.spawnNextInQue();
 
@@ -29,7 +32,7 @@ module.exports.loop = function () {
   const spawns = _.filter(Game.spawns, spawn => spawn.spawning != null || spawn.spawning != undefined);
   for (const i in spawns) {
     const s = spawns[i];
-    s.room.visual.text(`🛠️ ${s.spawning.name} ${s.spawning.remainingTime}`, s.pos, { color: '#fefefe', font: 0.8 });
+    s.room.visual.text(`🛠️ ${s.spawning.name} in ${s.spawning.remainingTime}`, s.pos, { color: '#fefefe', font: 0.8 });
   }
 
   // FIXME: This only works in Spawn1

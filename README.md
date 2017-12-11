@@ -60,10 +60,10 @@ have your warriors to be built tougher if you have the extensions, you might def
 
 ```javascript
 [
-	[TOUGH, TOUGH, MOVE, ATTACK, ATTACK],
-	[TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK],
-	[TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL],
-	[TOUGH, TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL]
+  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK],
+  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK],
+  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL],
+  [TOUGH, TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL]
 ]
 ```
 
@@ -85,7 +85,7 @@ for a warrior, instead of scaling it normally, in your roles_warrior.js file you
 
 ```javascript
 warrior.prototype.getParts = function() {
-	const key = Math.floor(Math.random() * this.parts.length);
-	return this.parts[key];
+  const key = Math.floor(Math.random() * this.parts.length);
+  return this.parts[key];
 }
 ```

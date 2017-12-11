@@ -2,7 +2,7 @@ const countType = require('countType');
 
 module.exports = {
   // FIXME
-  theRoom: Game.rooms.W32S12,
+  theRoom: null, //Game.rooms.W32S12,
 
   init() {
     if (Memory.factoryInit !== undefined) {

@@ -1,5 +1,3 @@
-const proto = require('role_prototype');
-
 const archer = {
   parts: [
     [RANGED_ATTACK, MOVE, MOVE],
@@ -13,8 +11,10 @@ const archer = {
 
   action() {
     const { creep } = this;
+    // console.log(`${creep.name}`);
 
     const target = this.getRangedTarget();
+    // console.log(`  target: ${target}`);
     if (target !== null) {
       creep.rangedAttack(target);
     }
@@ -27,6 +27,8 @@ const archer = {
 
     this.kite(target);
     creep.rangedAttack(target);
+
+    return null;
   },
 };
 
