@@ -22,13 +22,16 @@
     "FIND_MY_CONSTRUCTION_SITES": false,
     "FIND_MY_SPAWNS": false,
     "FIND_MY_STRUCTURES": false,
+    "FIND_SOURCES_ACTIVE": false,
     "FIND_STRUCTURES": false,
+    "RANGED_ATTACK": false,
     "RESOURCE_ENERGY": false,
     "STRUCTURE_CONTAINER": false,
     "STRUCTURE_EXTENSION": false,
     "STRUCTURE_STORAGE": false,
     "STRUCTURE_WALL": false,
     "WORK": false,
+    "Memory": false,
   },
   "rules": {
     "valid-jsdoc": ["error", {
