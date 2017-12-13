@@ -1,15 +1,15 @@
-module.exports = function (creeps) {
+module.exports = (creeps) => {
   const roleManager = require('roleManager');
-  const roles = { };
 
   // For each creep, check if they have a role. If they do, load and run it
-  for (const name in creeps)  {
-     // console.log(`  ${name}`)
+  Object.keys(creeps).forEach((name) => {
+  // for (const name in creeps) {
+    // console.log(`  ${name}`)
     const creep = creeps[name];
-    if (creep.spawning || creep.memory.role == undefined
+    if (creep.spawning || creep.memory.role == null
       || (creep.memory.active !== undefined && !creep.memory.active)) {
-     //   console.log(`  Skipping creep: ${creep.name}`)
-      continue;
+      //   console.log(`  Skipping creep: ${creep.name}`)
+      return;
     }
 
     const roleName = creep.memory.role;
@@ -31,5 +31,5 @@ module.exports = function (creeps) {
       console.log(e.message);
       console.log(e.stack);
     }
-  }
+  });
 };

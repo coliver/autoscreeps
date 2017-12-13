@@ -5,7 +5,7 @@
  * @param source
  * @returns destination
  */
-module.exports = function (destination, source) {
+module.exports = (destination, source) => {
   for (var k in source) {
     if (!destination.hasOwnProperty(k)) {
       destination[k] = source[k];

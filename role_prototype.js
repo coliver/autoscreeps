@@ -19,7 +19,7 @@ const proto = {
   run() {
     // console.log(`role_prototype.run`);
     // console.log(`  ${this.creep.name}`);
-    if (this.creep.memory.onSpawned == undefined) {
+    if (this.creep.memory.onSpawned == null) {
       this.onSpawn();
       this.creep.memory.onSpawned = true;
     }
@@ -30,13 +30,13 @@ const proto = {
   },
 
   handleEvents() {
-    if (this.creep.memory.onSpawned == undefined) {
+    if (this.creep.memory.onSpawned == null) {
       this.onSpawnStart();
       this.onSpawn();
       this.creep.memory.onSpawned = true;
     }
 
-    if (this.creep.memory.onSpawnEnd == undefined && !this.creep.spawning) {
+    if (this.creep.memory.onSpawnEnd == null && !this.creep.spawning) {
       this.onSpawnEnd();
       this.creep.memory.onSpawnEnd = true;
     }
@@ -88,7 +88,7 @@ const proto = {
    * @url https://bitbucket.org/Djinni/screeps/
    */
   rest(civilian) {
-    const creep = this.creep;
+    const { creep } = this;
 
     let distance = 4;
     let restTarget = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
@@ -148,7 +148,7 @@ const proto = {
 
   keepAwayFromEnemies() {
     // console.log("this.keepAwayFromEnemies");
-    const {creep} = this;
+    const { creep } = this;
 
     const target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
     // console.log(target);
@@ -163,7 +163,7 @@ const proto = {
    * @url https://bitbucket.org/Djinni/screeps/
    */
   kite(target) {
-    const creep = this.creep;
+    const { creep } = this;
 
     if (target.pos.inRangeTo(creep.pos, 2)) {
       creep.moveTo(creep.pos.x + creep.pos.x - target.pos.x, creep.pos.y + creep.pos.y - target.pos.y, { visualizePathStyle: { stroke: '#ffaa00' } });
@@ -173,13 +173,10 @@ const proto = {
     }
     creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
     return true;
-
-
-    return false;
   },
 
   getRangedTarget() {
-    const creep = this.creep;
+    const { creep } = this;
     console.log('getRangedTarget()');
 
     const closeArchers = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {

@@ -1,7 +1,12 @@
 // TODO: Make this room specific
-module.exports = (type, qued) => {
+module.exports = (type, queued) => {
   // console.log(`countType(${type}, ${qued})`);
-  if (qued === undefined) { qued = false; }
+  let qued;
+  if (queued === undefined) {
+    qued = false;
+  } else {
+    qued = queued;
+  }
 
   // Find all creeps in that room by their role
   let count = _.filter(Game.creeps, { memory: { role: type } }).length || 0;
@@ -23,7 +28,7 @@ module.exports = (type, qued) => {
     if (Memory.spawnQue === undefined) { Memory.spawnQue = []; }
 
     // Check the spawnQue itself
-    count += Memory.spawnQue.filter(qued => qued === type).length;
+    count += Memory.spawnQue.filter(theQueued => theQueued === type).length;
   }
 
   return count;

@@ -2,7 +2,7 @@ const countType = require('countType');
 
 module.exports = {
   // FIXME
-  theRoom: null, //Game.rooms.W32S12,
+  theRoom: null, // Game.rooms.W32S12,
 
   init() {
     if (Memory.factoryInit !== undefined) {
@@ -133,8 +133,7 @@ module.exports = {
 
     const requiredCounts = this.getCounts(requiredScreeps);
     // console.log('  ' + JSON.stringify(requiredCounts))
-
-    for (const role in requiredCounts) {
+    Object.keys(requiredCounts).forEach((role) => {
       // console.log(`    role: ${role} ${requiredCounts[role]}`);
       const requiredCount = requiredCounts[role];
       const actualCount = countType(role, true);
@@ -152,7 +151,27 @@ module.exports = {
         // console.log(`  pushing ${role} to spawnque`);
         Memory.spawnQue.push(role);
       }
-    }
+    });
+
+    // for (const role in requiredCounts) {
+    //   // console.log(`    role: ${role} ${requiredCounts[role]}`);
+    //   const requiredCount = requiredCounts[role];
+    //   const actualCount = countType(role, true);
+    //   // console.log(`    actualCount: ${actualCount}`);
+    //
+    //   if (actualCount > requiredCount) {
+    //     // remove some shit from the queue.
+    //     const datIndex = Memory.spawnQue.indexOf(role);
+    //     if (datIndex !== -1) {
+    //       // console.log(`  removing ${role} from spawnque`);
+    //       Memory.spawnQue.splice(datIndex, 1);
+    //       this.spawnRequiredScreeps();
+    //     }
+    //   } else if (actualCount < requiredCount) {
+    //     // console.log(`  pushing ${role} to spawnque`);
+    //     Memory.spawnQue.push(role);
+    //   }
+    // }
   },
 
   buildArmyWhileIdle() {
