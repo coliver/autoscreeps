@@ -6,18 +6,22 @@ const WALL_REPAIR_MAX = 10000;
 
 module.exports.loop = () => {
   // cleanup dead Screeps
-  Object.keys(Memory.creeps).forEach((key) => {
-    if (!Game.creeps[key]) {
-      delete Memory.creeps[key];
-    }
-  });
+  if (Memory.creeps) {
+    Object.keys(Memory.creeps).forEach((key) => {
+      if (!Game.creeps[key]) {
+        delete Memory.creeps[key];
+      }
+    });
+  }
 
   // MAIN
-  Object.keys(Game.rooms).forEach((key) => {
-    factory.theRoom = Game.rooms[key];
-    factory.init();
-    factory.run();
-  });
+  if (Game.rooms) {
+    Object.keys(Game.rooms).forEach((key) => {
+      factory.theRoom = Game.rooms[key];
+      factory.init();
+      factory.run();
+    });
+  }
 
   spawner.spawnNextInQue();
 
@@ -29,7 +33,10 @@ module.exports.loop = () => {
   // TODO find a better spot for this
   // Show room messages
   // Say what is spawning:
-  const spawns = _.filter(Game.spawns, spawn => spawn.spawning != null || spawn.spawning != undefined);
+  const spawns = _.filter(Game.spawns, (spawn) => {
+    return spawn.spawning !== undefined && spawn.spawning !== null
+  });
+
   for (const i in spawns) {
     const s = spawns[i];
     s.room.visual.text(`🛠️ ${s.spawning.name} in ${s.spawning.remainingTime}`, s.pos, { color: '#fefefe', font: 0.8 });

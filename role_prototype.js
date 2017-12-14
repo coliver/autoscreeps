@@ -26,7 +26,15 @@ const proto = {
 
     this.action(this.creep);
 
+    this.placeRoad();
+
     if (this.creep.ticksToLive === 1) { this.beforeAge(); }
+  },
+
+  placeRoad() {
+    const { creep } = this
+
+    creep.room.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
   },
 
   handleEvents() {
@@ -128,13 +136,13 @@ const proto = {
    * @url https://bitbucket.org/Djinni/screeps/
    */
   rangedAttack(target) {
-    console.log(`  rangedAttack(${target})`);
+    // console.log(`  rangedAttack(${target})`);
     const creep = this.creep;
 
     if (!target) {
-      console.log('    find target!');
+      // console.log('    find target!');
       target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-      console.log(`    target: ${target}`);
+      // console.log(`    target: ${target}`);
     }
 
     if (target) {
@@ -177,7 +185,7 @@ const proto = {
 
   getRangedTarget() {
     const { creep } = this;
-    console.log('getRangedTarget()');
+    // console.log('getRangedTarget()');
 
     const closeArchers = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
       filter(enemy) {
@@ -186,7 +194,7 @@ const proto = {
       },
     });
 
-    console.log(`  closeArchers: ${closeArchers}`);
+    // console.log(`  closeArchers: ${closeArchers}`);
     if (closeArchers != null) {
       return closeArchers;
     }
@@ -199,7 +207,7 @@ const proto = {
       },
     });
 
-    console.log(`  closeMobileMelee: ${closeMobileMelee}`);
+    // console.log(`  closeMobileMelee: ${closeMobileMelee}`);
     if (closeMobileMelee != null) {
       return closeMobileMelee;
     }
@@ -212,14 +220,14 @@ const proto = {
       },
     });
 
-    console.log(`  closeHealer: ${closeHealer}`);
+    // console.log(`  closeHealer: ${closeHealer}`);
     if (closeHealer != null) {
       return closeHealer;
     }
 
     const closestByRange = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
 
-    console.log(`  closestByRange: ${closestByRange}`);
+    // console.log(`  closestByRange: ${closestByRange}`);
     return closestByRange;
   },
 

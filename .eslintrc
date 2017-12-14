@@ -29,6 +29,7 @@
     "RESOURCE_ENERGY": false,
     "STRUCTURE_CONTAINER": false,
     "STRUCTURE_EXTENSION": false,
+    "STRUCTURE_ROAD": false,
     "STRUCTURE_STORAGE": false,
     "STRUCTURE_TOWER": false,
     "STRUCTURE_WALL": false,
