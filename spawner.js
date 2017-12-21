@@ -6,7 +6,11 @@ const spawner = {
   addToQue(creep, unshift) {
     this.initSpawnQue();
 
-    if (unshift !== undefined && unshift === true) { Memory.spawnQue.unshift(creep); } else { Memory.spawnQue.push(creep); }
+    if (unshift !== undefined && unshift === true) {
+      Memory.spawnQue.unshift(creep);
+    } else {
+      Memory.spawnQue.push(creep);
+    }
   },
 
   spawnNextInQue() {
@@ -16,7 +20,7 @@ const spawner = {
     if (!Memory.spawnQue.length) { return; }
 
     // Get spawns that are ready
-    const spawns = _.filter(Game.spawns, spawn => spawn.spawning === null || spawn.spawning === undefined);
+    const spawns = _.filter(Game.spawns, spawn => spawn.spawning == null);
 
     if (spawns.length === null || spawns.length === 0) { return; }
 
@@ -42,7 +46,6 @@ const spawner = {
   },
 
   spawn(role, memory, spawnPoint) {
-    // console.log("Spawn time! role:" + JSON.stringify(role) + '  memory: ' + JSON.stringify(memory))
     if (!spawnPoint) { spawnPoint = Game.spawns.Spawn1; }
 
     const manager = require('roleManager');
@@ -56,27 +59,22 @@ const spawner = {
       return;
     }
 
-    if (memory == undefined) { memory = { }; }
+    if (memory == null) { memory = { }; }
 
     memory.role = role;
 
     let nameCount = 0;
     let name = null;
     while (name == null) {
-      nameCount++;
+      nameCount += 1;
       const tryName = role + nameCount;
-      if (Game.creeps[tryName] == undefined) { name = tryName; }
+      if (Game.creeps[tryName] == null) { name = tryName; }
     }
 
     return spawnPoint.spawnCreep(manager.getRoleBodyParts(role), name, { memory });
   },
 
   canSpawn(spawnPoint, role) {
-    if (typeof spawnPoint === 'string' && role == undefined) {
-      console.log('?? Why are we in here???');
-      role = spawnPoint;
-      spawnPoint = Game.spawns.Spawn1;
-    }
     console.log(`          Room capacity ${spawnPoint.room.energyAvailable} / ${spawnPoint.room.energyCapacityAvailable}`);
     console.log(`        this.spawnCost(${role}) ${this.spawnCost(role)}`);
 

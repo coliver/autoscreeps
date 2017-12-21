@@ -6,7 +6,7 @@
  * @returns destination
  */
 module.exports = (destination, source) => {
-  for (var k in source) {
+  for (const k in source) {
     if (!destination.hasOwnProperty(k)) {
       destination[k] = source[k];
     }

@@ -28,6 +28,7 @@
     "FIND_SOURCES_ACTIVE": false,
     "FIND_STRUCTURES": false,
     "HEAL": false,
+    "OK": false,
     "RANGED_ATTACK": false,
     "RESOURCE_ENERGY": false,
     "STRUCTURE_CONTAINER": false,
