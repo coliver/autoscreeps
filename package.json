@@ -1,0 +1,29 @@
+{
+  "name": "autoscreeps",
+  "version": "1.0.0",
+  "description": "This is heavily modified version of https://github.com/Garethp/Screeps",
+  "main": "main.js",
+  "dependencies": {
+    "babel-eslint": "^8.0.3",
+    "eslint": "^4.9.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
+    "eslint-plugin-screeps": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coliver/autoscreeps.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coliver/autoscreeps/issues"
+  },
+  "homepage": "https://github.com/coliver/autoscreeps#readme"
+}

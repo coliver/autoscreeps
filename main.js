@@ -1,51 +1,52 @@
 const performRoles = require('performRoles');
 const factory = require('factory');
 const spawner = require('spawner');
+const messageManager = require('messageManager');
 
-const WALL_REPAIR_MAX = 10000
+const WALL_REPAIR_MAX = 10000;
 
-module.exports.loop = function () {
-  //cleanup dead Screeps
-  for(var i in Memory.creeps) {
-    if(!Game.creeps[i]) {
-        delete Memory.creeps[i];
-    }
+module.exports.loop = () => {
+  // cleanup dead Screeps
+  if (Memory.creeps) {
+    Object.keys(Memory.creeps).forEach((key) => {
+      if (!Game.creeps[key]) {
+        delete Memory.creeps[key];
+      }
+    });
   }
 
   // MAIN
-  factory.init();
-  factory.run();
+  if (Game.rooms) {
+    Object.keys(Game.rooms).forEach((key) => {
+      factory.theRoom = Game.rooms[key];
+      factory.init();
+      factory.run();
+    });
+  }
 
   spawner.spawnNextInQue();
 
   performRoles(Game.creeps);
 
   factory.buildArmyWhileIdle();
-  /// END MAIN
+  // / END MAIN
 
-  // TODO find a better spot for this
-  // Show room messages
-  // Say what is spawning:
-  const spawns = _.filter(Game.spawns, (spawn) =>  spawn.spawning != null || spawn.spawning != undefined);
-  for(let i in spawns) {
-    const s = spawns[i];
-    s.room.visual.text(`🛠️ ${s.spawning.name} ${s.spawning.remainingTime}`, s.pos, {color: '#fefefe', font: 0.8});
-  }
+  messageManager.showSpawningThings();
 
   // FIXME: This only works in Spawn1
   const targets = Game.spawns.Spawn1.room.find(FIND_HOSTILE_CREEPS);
-  if(targets.length > 0) {
+  if (targets.length > 0) {
     Game.spawns.Spawn1.room.controller.activateSafeMode();
   }
 
   // TODO: Move this out into its own file.
   // TOWERS
   const towers = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {
-                  filter: { structureType: STRUCTURE_TOWER }
-                 })
+    filter: { structureType: STRUCTURE_TOWER },
+  });
 
-  _.forEach(towers, function(tower) {
-    let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+  _.forEach(towers, (tower) => {
+    const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
       filter: (structure) => {
         switch (structure.structureType) {
           case STRUCTURE_WALL:
@@ -53,15 +54,15 @@ module.exports.loop = function () {
           default:
             return structure.hits < structure.hitsMax;
         }
-      }
+      },
     });
-    if(closestDamagedStructure) {
+    if (closestDamagedStructure) {
       tower.repair(closestDamagedStructure);
     }
 
-    let closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-    if(closestHostile) {
+    const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    if (closestHostile) {
       tower.attack(closestHostile);
     }
-  })
-}
+  });
+};

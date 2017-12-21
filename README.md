@@ -5,9 +5,9 @@ This is always a work in progress.
 Overview
 =======
 This library includes a number of things, the main two of which are the are the **roles** functionality and the **spawner**.
-The spawner mainly uses what is known as a role to make human readable aliases to spawn off of, as well as containing some
+The spawner uses what is known as a role to make human readable aliases to spawn off of, as well as containing some
 methods to help managing the spawner. The roles are a set of classes that are made to be sharable between projects, so if
-you want to share your particular body parts config, or the ai, for a role with someone else, it should be easy to simply
+you want to share your particular body parts config, or the AI, for a role with someone else, it should be easy to simply
 plug and play.
 
 Spawner
@@ -60,10 +60,10 @@ have your warriors to be built tougher if you have the extensions, you might def
 
 ```javascript
 [
-	[TOUGH, TOUGH, MOVE, ATTACK, ATTACK],
-	[TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK],
-	[TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL],
-	[TOUGH, TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL]
+  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK],
+  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK],
+  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL],
+  [TOUGH, TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL]
 ]
 ```
 
@@ -76,7 +76,7 @@ Further more, you can see what kind of creep will be spawned with your current c
 as using the command
 
 ```javascript
-require('roleManager').getRoleBodyParts('warrior')
+require('roleManager').getRoleBodyParts('warrior');
 ```
 
 And it will send you a list of body parts that suit the current situation. The logic for selecting what level can also be
@@ -84,8 +84,8 @@ overriden by changing the .prototype.getParts() function for a role. For example
 for a warrior, instead of scaling it normally, in your roles_warrior.js file you could define
 
 ```javascript
-warrior.prototype.getParts = function() {
-	const key = Math.floor(Math.random() * this.parts.length);
-	return this.parts[key];
+warrior.prototype.getParts = () => {
+  const key = Math.floor(Math.random() * this.parts.length);
+  return this.parts[key];
 }
 ```

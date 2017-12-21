@@ -1,283 +1,277 @@
-var proto = {
-	/**
-	 * The creep for this role
-	 *
-	 * @type creep
-	 */
-	creep: null,
+const proto = {
+  /**
+   * The creep for this role
+   *
+   * @type creep
+   */
+  creep: null,
 
-	/**
-	 * Set the creep for this role
-	 *
-	 * @param {Creep} creep
-	 */
-	setCreep: function(theCreep) {
-		this.creep = theCreep;
-		return this;
-	},
+  /**
+   * Set the creep for this role
+   *
+   * @param {Creep} creep
+   */
+  setCreep(theCreep) {
+    this.creep = theCreep;
+    return this;
+  },
 
-	run: function() {
-		if(this.creep.memory.onSpawned == undefined) {
-			this.onSpawn();
-			this.creep.memory.onSpawned = true;
-		}
+  run() {
+    // console.log(`role_prototype.run`);
+    // console.log(`  ${this.creep.name}`);
+    if (this.creep.memory.onSpawned == null) {
+      this.onSpawn();
+      this.creep.memory.onSpawned = true;
+    }
 
-		this.action(this.creep);
+    this.action(this.creep);
 
-		if(this.creep.ticksToLive == 1)
-			this.beforeAge();
-	},
+    this.placeRoad();
 
-	handleEvents: function() {
-		if(this.creep.memory.onSpawned == undefined) {
-			this.onSpawnStart();
-			this.onSpawn();
-			this.creep.memory.onSpawned = true;
-		}
+    if (this.creep.ticksToLive === 1) { this.beforeAge(); }
+  },
 
-		if(this.creep.memory.onSpawnEnd == undefined && !this.creep.spawning) {
-			this.onSpawnEnd();
-			this.creep.memory.onSpawnEnd = true;
-		}
-	},
+  placeRoad() {
+    const { creep } = this
 
-	// TODO: Make this work for more than one spawn
-	getParts: function() {
-		var _ = require('lodash');
+    creep.room.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
+  },
 
-		const potentialEnergy = Game.spawns.Spawn1.room.energyCapacityAvailable
+  handleEvents() {
+    if (this.creep.memory.onSpawned == null) {
+      this.onSpawnStart();
+      this.onSpawn();
+      this.creep.memory.onSpawned = true;
+    }
 
-		var parts = _.cloneDeep(this.parts);
+    if (this.creep.memory.onSpawnEnd == null && !this.creep.spawning) {
+      this.onSpawnEnd();
+      this.creep.memory.onSpawnEnd = true;
+    }
+  },
 
-		// If this isn't an array of arrays, return "level 1" parts
-		if(typeof parts[0] != "object") {
-			return this.parts;
-		}
+  // TODO: Make this work for more than one spawn
+  getParts() {
+    const _ = require('lodash');
 
-		parts.reverse();
+    const potentialEnergy = Game.spawns.Spawn1.room.energyCapacityAvailable;
 
-		let chosenParts = null;
+    const parts = _.cloneDeep(this.parts);
 
-		for(var i in parts) {
-			if(this.spawnCost(parts[i]) <= potentialEnergy) {
-				chosenParts = parts[i];
-				break;
-			}
-		}
+    // If this isn't an array of arrays, return "level 1" parts
+    if (typeof parts[0] !== 'object') {
+      return this.parts;
+    }
 
-		if(chosenParts === null) {
-			throw `Couldn't find parts to work with!`
-		}
+    parts.reverse();
 
-		return chosenParts;
-	},
+    let chosenParts = null;
 
-	// getParts: function() {
-	// 	var _ = require('lodash');
-  //
-	// 	const extensions = _.filter(Game.structures, (struct) =>
-	// 										   struct.structureType == STRUCTURE_EXTENSION && struct.isActive()
-	// 										 ).length;
-  //
-	// 	var parts = _.cloneDeep(this.parts);
-	// 	if(typeof parts[0] != "object") {
-	// 		return this.parts;
-	// 	}
-  //
-	// 	parts.reverse();
-  //
-	// 	for(var i in parts) {
-	// 		if((parts[i].length - 5) <= extensions) {
-	// 			return parts[i];
-	// 		}
-	// 	}
-	// },
+    for (const i in parts) {
+      if (this.spawnCost(parts[i]) <= potentialEnergy) {
+        chosenParts = parts[i];
+        break;
+      }
+    }
 
-	action: function() { },
+    if (chosenParts === null) {
+      throw 'Couldn\'t find parts to work with!';
+    }
 
-	onSpawn: function() { },
+    return chosenParts;
+  },
 
-	onSpawnStart: function() { },
+  action() { },
 
-	onSpawnEnd: function() { },
+  onSpawn() { },
 
-	beforeAge: function() { },
+  onSpawnStart() { },
 
-	/**
-	 * All credit goes to Djinni
-	 * @url https://bitbucket.org/Djinni/screeps/
-	 */
-	rest: function(civilian) {
-		var creep = this.creep;
+  onSpawnEnd() { },
 
-		var distance = 4;
-		var restTarget = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+  beforeAge() { },
 
-		if(!civilian) {
-			var flags = Game.flags;
-			for (var i in flags) {
-				var flag = flags[i];
-				if (creep.pos.inRangeTo(flag, distance) || creep.pos.findPathTo(flag).length > 0) {
-					restTarget = flag;
-					break;
-				}
-			}
-		}
+  /**
+   * All credit goes to Djinni
+   * @url https://bitbucket.org/Djinni/screeps/
+   */
+  rest(civilian) {
+    const { creep } = this;
 
-//		var flag = Game.flags['Flag1'];
-//		if(flag !== undefined && civilian !== true)
-//			restTarget = flag;
-//
-//		var flag2 = Game.flags['Flag2'];
-//		if(flag !== undefined && civilian !== true && !creep.pos.inRangeTo(flag, distance) && !creep.pos.findPathTo(flag).length)
-//			restTarget = flag2;
+    let distance = 4;
+    let restTarget = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
 
-		if (creep.getActiveBodyparts(HEAL)) {
-			distance = distance - 1;
-		}
-		else if (creep.getActiveBodyparts(RANGED_ATTACK)) {
-			distance = distance - 1;
-		}
-		if (creep.pos.findPathTo(restTarget).length > distance) {
-			// TODO: Use 'my color' here
-			creep.moveTo(restTarget, {visualizePathStyle: {stroke: '#ffaa00'}});
-		}
-	},
+    if (!civilian) {
+      const flags = Game.flags;
+      for (const i in flags) {
+        const flag = flags[i];
+        if (creep.pos.inRangeTo(flag, distance) || creep.pos.findPathTo(flag).length > 0) {
+          restTarget = flag;
+          break;
+        }
+      }
+    }
 
-	/**
-	 * All credit goes to Djinni
-	 * @url https://bitbucket.org/Djinni/screeps/
-	 */
-	rangedAttack: function(target) {
-		var creep = this.creep;
+    //    var flag = Game.flags['Flag1'];
+    //    if(flag !== undefined && civilian !== true)
+    //      restTarget = flag;
+    //
+    //    var flag2 = Game.flags['Flag2'];
+    //    if(flag !== undefined && civilian !== true && !creep.pos.inRangeTo(flag, distance) && !creep.pos.findPathTo(flag).length)
+    //      restTarget = flag2;
 
-		if(!target) {
-			target = creep.pos.findClosestByRange(Game.HOSTILE_CREEPS);
-		}
+    if (creep.getActiveBodyparts(HEAL)) {
+      distance -= 1;
+    } else if (creep.getActiveBodyparts(RANGED_ATTACK)) {
+      distance -= 1;
+    }
+    if (creep.pos.findPathTo(restTarget).length > distance) {
+      // TODO: Use 'my color' here
+      creep.moveTo(restTarget, { visualizePathStyle: { stroke: '#ffaa00' } });
+    }
+  },
 
-		if(target) {
-			if (target.pos.inRangeTo(creep.pos, 3) ) {
-				creep.rangedAttack(target);
-				return target;
-			}
-		}
-		return null;
-	},
+  /**
+   * All credit goes to Djinni
+   * @url https://bitbucket.org/Djinni/screeps/
+   */
+  rangedAttack(target) {
+    // console.log(`  rangedAttack(${target})`);
+    const creep = this.creep;
 
-	keepAwayFromEnemies: function() {
-		// console.log("this.keepAwayFromEnemies");
-		var creep = this.creep;
+    if (!target) {
+      // console.log('    find target!');
+      target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+      // console.log(`    target: ${target}`);
+    }
 
-		var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-		// console.log(target);
-		if(target !== null && target.pos.inRangeTo(creep.pos, 4)) {
-			// console.log("RUN AWAY")
-			creep.moveTo(creep.pos.x + creep.pos.x - target.pos.x, creep.pos.y + creep.pos.y - target.pos.y, {visualizePathStyle: {stroke: '#ffaa00'}});
-		}
-	},
+    if (target) {
+      if (target.pos.inRangeTo(creep.pos, 3)) {
+        creep.rangedAttack(target);
+        return target;
+      }
+    }
+    return null;
+  },
 
-	/**
-	 * All credit goes to Djinni
-	 * @url https://bitbucket.org/Djinni/screeps/
-	 */
-	kite: function(target) {
-		var creep = this.creep;
+  keepAwayFromEnemies() {
+    // console.log("this.keepAwayFromEnemies");
+    const { creep } = this;
 
-		if (target.pos.inRangeTo(creep.pos, 2)) {
-			creep.moveTo(creep.pos.x + creep.pos.x - target.pos.x, creep.pos.y + creep.pos.y - target.pos.y, {visualizePathStyle: {stroke: '#ffaa00'}} );
-			return true;
-		} else if (target.pos.inRangeTo(creep.pos, 3)) {
-			return true;
-		} else {
-			creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
-			return true;
-		}
+    const target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    // console.log(target);
+    if (target !== null && target.pos.inRangeTo(creep.pos, 4)) {
+      // console.log("RUN AWAY")
+      creep.moveTo(creep.pos.x + creep.pos.x - target.pos.x, creep.pos.y + creep.pos.y - target.pos.y, { visualizePathStyle: { stroke: '#ffaa00' } });
+    }
+  },
 
-		return false;
-	},
+  /**
+   * All credit goes to Djinni
+   * @url https://bitbucket.org/Djinni/screeps/
+   */
+  kite(target) {
+    const { creep } = this;
 
-	getRangedTarget: function() {
-		var creep = this.creep;
+    if (target.pos.inRangeTo(creep.pos, 2)) {
+      creep.moveTo(creep.pos.x + creep.pos.x - target.pos.x, creep.pos.y + creep.pos.y - target.pos.y, { visualizePathStyle: { stroke: '#ffaa00' } });
+      return true;
+    } else if (target.pos.inRangeTo(creep.pos, 3)) {
+      return true;
+    }
+    creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
+    return true;
+  },
 
-		var closeArchers = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-			filter: function(enemy)
-			{
-				return enemy.getActiveBodyparts(RANGED_ATTACK) > 0
-					&& creep.pos.inRangeTo(enemy, 3);
-			}
-		});
+  getRangedTarget() {
+    const { creep } = this;
+    // console.log('getRangedTarget()');
 
-		if(closeArchers != null)
-			return closeArchers;
+    const closeArchers = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+      filter(enemy) {
+        return enemy.getActiveBodyparts(RANGED_ATTACK) > 0
+          && creep.pos.inRangeTo(enemy, 3);
+      },
+    });
 
-		var closeMobileMelee = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-			filter: function(enemy)
-			{
-				return enemy.getActiveBodyparts(ATTACK) > 0
-					&& enemy.getActiveBodyparts(MOVE) > 0
-					&& creep.pos.inRangeTo(enemy, 3);
-			}
-		});
+    // console.log(`  closeArchers: ${closeArchers}`);
+    if (closeArchers != null) {
+      return closeArchers;
+    }
 
-		if(closeMobileMelee != null)
-			return closeMobileMelee;
+    const closeMobileMelee = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+      filter(enemy) {
+        return enemy.getActiveBodyparts(ATTACK) > 0
+          && enemy.getActiveBodyparts(MOVE) > 0
+          && creep.pos.inRangeTo(enemy, 3);
+      },
+    });
 
-		var closeHealer = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-			filter: function(enemy)
-			{
-				return enemy.getActiveBodyparts(HEAL) > 0
-					&& enemy.getActiveBodyparts(MOVE) > 0
-					&& creep.pos.inRangeTo(enemy, 3);
-			}
-		});
+    // console.log(`  closeMobileMelee: ${closeMobileMelee}`);
+    if (closeMobileMelee != null) {
+      return closeMobileMelee;
+    }
 
-		if(closeHealer != null)
-			return closeHealer;
+    const closeHealer = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+      filter(enemy) {
+        return enemy.getActiveBodyparts(HEAL) > 0
+          && enemy.getActiveBodyparts(MOVE) > 0
+          && creep.pos.inRangeTo(enemy, 3);
+      },
+    });
 
-		return creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-	},
+    // console.log(`  closeHealer: ${closeHealer}`);
+    if (closeHealer != null) {
+      return closeHealer;
+    }
 
-	spawnCost: function(parts)	{
-		var total = 0;
-		for(var index in parts) {
-			var part = parts[index];
-			switch(part) {
-				case MOVE:
-					total += 50
-					break;
+    const closestByRange = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
 
-				case WORK:
-					total += 100
-					break;
+    // console.log(`  closestByRange: ${closestByRange}`);
+    return closestByRange;
+  },
 
-				case CARRY:
-					total += 50
-					break;
+  spawnCost(parts) {
+    let total = 0;
+    for (const index in parts) {
+      const part = parts[index];
+      switch (part) {
+        case MOVE:
+          total += 50;
+          break;
 
-				case ATTACK:
-					total += 80
-					break;
+        case WORK:
+          total += 100;
+          break;
 
-				case RANGED_ATTACK:
-					total += 150
-					break;
+        case CARRY:
+          total += 50;
+          break;
 
-				case HEAL:
-					total += 250
-					break;
+        case ATTACK:
+          total += 80;
+          break;
 
-				case TOUGH:
-					total += 10
-					break;
+        case RANGED_ATTACK:
+          total += 150;
+          break;
 
-				case CLAIM:
-					total += 600
-					break;
-			}
-		}
+        case HEAL:
+          total += 250;
+          break;
 
-		return total;
-	},
+        case TOUGH:
+          total += 10;
+          break;
+
+        case CLAIM:
+          total += 600;
+          break;
+      }
+    }
+
+    return total;
+  },
 };
 
 module.exports = proto;

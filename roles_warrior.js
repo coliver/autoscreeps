@@ -1,28 +1,20 @@
-var proto = require('role_prototype');
+const warrior = {
+  parts: [
+    [TOUGH, TOUGH, MOVE, ATTACK, ATTACK],
+  ],
 
-var warrior = {
-	parts: [
-		[TOUGH, TOUGH, MOVE, ATTACK, ATTACK]
-	],
-
-	/**
-	 * @TODO: We need to get archers to prioritise their targets better
-	 */
-	action: function()
-	{
-		var creep = this.creep;
+  action() {
+    const { creep } = this;
 
     const target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-    if(target) {
-      if(creep.attack(target) == ERR_NOT_IN_RANGE) {
+    if (target) {
+      if (creep.attack(target) === ERR_NOT_IN_RANGE) {
         creep.moveTo(target);
       }
     }
 
-		//If there's not a target near by, let's go search for a target if need be
-		if(target === null)
-			return this.rest();
-	}
+    if (target === null) { return this.rest(); }
+  },
 };
 
 module.exports = warrior;
