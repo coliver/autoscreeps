@@ -1,6 +1,7 @@
 const performRoles = require('performRoles');
 const factory = require('factory');
 const spawner = require('spawner');
+const messageManager = require('messageManager');
 
 const WALL_REPAIR_MAX = 10000;
 
@@ -30,17 +31,7 @@ module.exports.loop = () => {
   factory.buildArmyWhileIdle();
   // / END MAIN
 
-  // TODO find a better spot for this
-  // Show room messages
-  // Say what is spawning:
-  const spawns = _.filter(Game.spawns, (spawn) => {
-    return spawn.spawning !== undefined && spawn.spawning !== null
-  });
-
-  for (const i in spawns) {
-    const s = spawns[i];
-    s.room.visual.text(`🛠️ ${s.spawning.name} in ${s.spawning.remainingTime}`, s.pos, { color: '#fefefe', font: 0.8 });
-  }
+  messageManager.showSpawningThings();
 
   // FIXME: This only works in Spawn1
   const targets = Game.spawns.Spawn1.room.find(FIND_HOSTILE_CREEPS);

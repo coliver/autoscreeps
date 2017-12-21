@@ -1,127 +1,133 @@
-/**
- * This guy just finds a source, and stays near it. His job is just to mine away and let the energy fall on the ground
- *
- * @TODO: See if we can't implement preffered spawn spots close to their source
- * @param creep
- */
-var miner = {
+// Finds a source, and stays near it.
+// His job is just to mine away and let the energy fall on the ground
+const miner = {
   parts: [
     [MOVE, WORK, WORK],
-    // [MOVE, WORK, WORK, WORK, WORK],
-    // [MOVE, WORK, WORK, WORK, WORK, WORK]
+    [MOVE, WORK, WORK, WORK, WORK],
+    [MOVE, WORK, WORK, WORK, WORK, WORK],
   ],
 
-  beforeAge: function() {
-    const creep = this.creep;
+  beforeAge() {
+    const { creep } = this;
 
     // Cleanup memory
-    if(Memory.sources[creep.memory.source].miner == creep.id) {
-      delete Memory.sources[creep.memory.source].miner
+    if (Memory.sources[creep.memory.source].miner === creep.id) {
+      delete Memory.sources[creep.memory.source].miner;
     }
   },
 
-  getOpenSource: function() {
+  getOpenSource() {
     // console.log("creep.getOpenSource")
-    var creep = this.creep;
+    const { creep } = this;
 
-    var source = creep.pos.findClosestByRange(FIND_SOURCES, {
-      filter: function(source) {
-        if(Memory.sources[source.id] == undefined || Memory.sources[source.id].miner == undefined || Memory.sources[source.id].miner == creep.id)
-          return true;
+    return creep.pos.findClosestByRange(FIND_SOURCES, {
+      filter(source) {
+        const memorySource = Memory.sources[source.id];
 
-        if(Game.getObjectById(Memory.sources[source.id].miner) == null)
+        if (memorySource == null || memorySource.miner == null || memorySource.miner === creep.id) {
           return true;
+        }
+
+        if (Game.getObjectById(memorySource.miner) == null) {
+          return true;
+        }
 
         return false;
-      }
+      },
     });
-    // console.log`  source: ${source}`)
-    return source;
   },
 
-  setSourceToMine: function(source) {
+  setSourceToMine(source) {
     // console.log(`  setSourceToMine(${source})`)
-    var creep = this.creep;
+    const { creep } = this;
+    const memorySources = Memory.sources;
+    const sourceId = source.id;
 
-    if(!source)
+    if (!source) {
       return;
+    }
 
-    if(Memory.sources[source.id] == undefined)
-      Memory.sources[source.id] = { id: source.id };
+    if (memorySources[sourceId] == null) {
+      memorySources[sourceId] = { id: sourceId };
+    }
 
-    Memory.sources[source.id].miner = creep.id;
-    creep.memory.source = source.id;
+    memorySources[sourceId].miner = creep.id;
+    creep.memory.source = sourceId;
   },
 
   createHelpers(source) {
-    var creep = this.creep
-    var helperSpawn = source.pos.findClosestByRange(FIND_MY_SPAWNS);
+    const { creep } = this;
+    const helperSpawn = source.pos.findClosestByRange(FIND_MY_SPAWNS);
 
-    var steps = helperSpawn.pos.findPathTo(source).length * 2;
-    var creepsNeeded = Math.round((steps * 8) / 100);
+    const steps = helperSpawn.pos.findPathTo(source).length * 2;
+    let creepsNeeded = Math.round((steps * 8) / 100);
 
-    if(creepsNeeded > 5)
+    if (creepsNeeded > 5) {
       creepsNeeded = 5;
-
-    for(var i = 0; i < creepsNeeded; i++) {
-      Memory.spawnQue.unshift({ type: 'miner_helper', memory: {
-        miner: creep.id
-      }});
     }
 
+    for (let i = 0; i < creepsNeeded; i += 1) {
+      Memory.spawnQue.unshift({
+        type: 'miner_helper',
+        memory: { miner: creep.id },
+      });
+    }
     creep.memory.helpersNeeded = creepsNeeded;
   },
 
-  onSpawn: function() {
-// console.log"creep.onSpawn")
-    var creep = this.creep;
+  onSpawn() {
+    // console.log"creep.onSpawn");
+    const { creep } = this;
 
     creep.memory.isNearSource = false;
     creep.memory.helpers = [];
 
-    var source = this.getOpenSource();
+    const source = this.getOpenSource();
     this.setSourceToMine(source);
     this.createHelpers(source);
 
     creep.memory.onSpawned = true;
   },
 
-  action: function() {
+  action() {
     // console.log`${this.creep.name} action`)
-    var creep = this.creep;
+    const { creep } = this;
 
-    //Basically, each miner can empty a whole source by themselves. Also, since they're slow, we don't have them
-    //moving away from the source when it's empty, it'd regenerate before they got to another one.
-    //For this, we assign one miner to one source, and they stay with it
-    var source = Game.getObjectById(creep.memory.source);
+    // Basically, each miner can empty a whole source by themselves.
+    // Since they're slow, we don't have them moving away from the source when
+    // it's empty, it'd regenerate before they got to another one. For this, we
+    // assign one miner to one source, and they stay with it
+    let source = Game.getObjectById(creep.memory.source);
 
-    if(source == null) {
-      var source = this.getOpenSource();
+    if (source == null) {
+      source = this.getOpenSource();
 
-      if(!source)
+      if (!source) {
         return;
+      }
 
       this.setSourceToMine(source);
     }
 
-    if(creep.pos.inRangeTo(source, 5))
+    if (creep.pos.inRangeTo(source, 5)) {
       creep.memory.isNearSource = true;
-    else
+    } else {
       creep.memory.isNearSource = false;
+    }
 
-    if(Memory.sources[source.id] == undefined)
+    if (Memory.sources[source.id] == null) {
       Memory.sources[source.id] = { id: source.id };
-
+    }
     Memory.sources[source.id].miner = creep.id;
-// console.log`${this.creep.name} action Moving to ${source}!`)
+    // console.log`${this.creep.name} action Moving to ${source}!`)
     if (creep.pos.isNearTo(source)) {
       creep.harvest(source);
     } else {
-      creep.moveTo(source, {visualizePathStyle: {stroke: '#ffaa00'}});
+      creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
     }
 
     this.keepAwayFromEnemies();
-  }
+  },
 };
 
 module.exports = miner;

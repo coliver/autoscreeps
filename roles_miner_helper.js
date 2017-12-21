@@ -1,4 +1,4 @@
-// This guys does the other half of energy collection. The miner gets it from the source, and the
+// This guy does the other half of energy collection. The miner gets it from the source, and the
 // helper does the transportation. We don't want them just going for the nearest source, as that
 // means that if we have more than one miner, all the helpers will only go for the first miner. To
 // counter this, we assign them to a miner the same way we assign a miner to a source
