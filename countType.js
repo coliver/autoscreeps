@@ -2,7 +2,7 @@
 module.exports = (type, queued) => {
   // console.log(`countType(${type}, ${qued})`);
   let qued;
-  if (queued === undefined) {
+  if (queued == null) {
     qued = false;
   } else {
     qued = queued;
@@ -18,14 +18,13 @@ module.exports = (type, queued) => {
 
     // Check against currently spawning creeps
     Object.keys(spawns).forEach((spawn) => {
-      if (spawn.spawning !== null
-        && spawn.spawning !== undefined
+      if (spawn.spawning != null
         && Game.creeps[spawn.spawning.name].role === type) {
         count += 1;
       }
     });
 
-    if (Memory.spawnQue === undefined) { Memory.spawnQue = []; }
+    if (Memory.spawnQue == null) { Memory.spawnQue = []; }
 
     // Check the spawnQue itself
     count += Memory.spawnQue.filter(theQueued => theQueued === type).length;

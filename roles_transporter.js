@@ -1,3 +1,4 @@
+// TODO: Reconider this whole class. It's basically a unassigned miner_helper.
 const transporter = {
   parts: [
     [CARRY, CARRY, MOVE, MOVE],
@@ -35,7 +36,7 @@ const transporter = {
 
         // console.log(`    ${containers}`);
 
-        for (const i in containers) {
+        for (let i = 0; i < containers.length; i += 1) {
           const container = containers[i];
           // console.log(`  container: ${container}`);
           if (container.isActive() && container.store[RESOURCE_ENERGY] > 0) {

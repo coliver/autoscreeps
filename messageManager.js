@@ -5,7 +5,7 @@ const messageManager = {
     // Say what is spawning:
     const spawns = _.filter(
       Game.spawns,
-      spawn => spawn.spawning !== undefined && spawn.spawning !== null,
+      spawn => spawn.spawning != null,
     );
 
     spawns.map((s) => {

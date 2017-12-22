@@ -7,10 +7,10 @@ module.exports = {
     [WORK, CARRY, MOVE],
     [WORK, WORK, CARRY, CARRY, MOVE],
     [WORK, WORK, CARRY, CARRY, MOVE, MOVE, CARRY],
-    //    [WORK,WORK,CARRY,CARRY,MOVE, MOVE, CARRY, MOVE],
-    //    [WORK,WORK,CARRY,CARRY,MOVE, MOVE, CARRY, MOVE, WORK],
-    //    [WORK,WORK,CARRY,CARRY,MOVE, MOVE, CARRY, MOVE, WORK, MOVE],
-    //    [WORK,WORK,CARRY,CARRY,MOVE, MOVE, CARRY, MOVE, WORK, MOVE, CARRY]
+    [WORK, WORK, CARRY, CARRY, MOVE, MOVE, CARRY, MOVE],
+    [WORK, WORK, CARRY, CARRY, MOVE, MOVE, CARRY, MOVE, WORK],
+    [WORK, WORK, CARRY, CARRY, MOVE, MOVE, CARRY, MOVE, WORK, MOVE],
+    [WORK, WORK, CARRY, CARRY, MOVE, MOVE, CARRY, MOVE, WORK, MOVE, CARRY],
   ],
 
   myColor: '#00ff11',
@@ -29,7 +29,7 @@ module.exports = {
       // console.log(`    ${containers}`);
       let target = null;
 
-      for (const i in containers) {
+      for (let i = 0; i < containers.length; i += 1) {
         const container = containers[i];
         // console.log(`  container: ${container}`);
 
@@ -50,7 +50,7 @@ module.exports = {
 
         // console.log(`  ${spawn.name} has ${extensions.length} extensions available`);
 
-        for (const i in extensions) {
+        for (let i = 0; i < extensions.length; i += 1) {
           const ext = extensions[i];
           if (ext.isActive() && (ext.energy > 0)) {
             target = ext;
@@ -87,7 +87,7 @@ module.exports = {
       const structures = creep.room.find(FIND_MY_STRUCTURES);
       const damagedRamparts = [];
 
-      for (const index in structures) {
+      for (let index = 0; index < structures.length; index += 1) {
         const structure = structures[index];
         if (structure.structureType === 'rampart' && structure.hits < (structure.hitsMax - 50)) {
           damagedRamparts.push(structure);
@@ -108,7 +108,7 @@ module.exports = {
       const halfBroken = creep.room.find(FIND_MY_STRUCTURES);
       const toRepair = [];
 
-      for (const index in halfBroken) {
+      for (let index = 0; index < halfBroken.length; index += 1) {
         if ((halfBroken[index].hits / halfBroken[index].hitsMax) < 0.5) {
           toRepair.push(halfBroken[index]);
         }

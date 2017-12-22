@@ -10,14 +10,62 @@ module.exports = {
     [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
   ],
 
+  action() {
+    const { creep } = this;
+    // console.log(`${creep.name}`);
+
+    if (this.courierCheck()) {
+      return;
+    }
+
+    // If this helper isn't assigned to a miner, find one and assign him to it.
+    // If it is assigned to a miner, then find that miner by his id
+    if (creep.memory.miner === undefined) { this.assignMiner(); }
+    const miner = Game.getObjectById(creep.memory.miner);
+    if (miner == null) {
+      creep.suicide();
+      return;
+    }
+
+    // Grab dropped energy near me or move to the miner
+    if (this.grabDroppedEnergy()) {
+      return;
+    }
+
+    let target = this.findATarget();
+
+    const courier = this.findACourier();
+    // If we found a courier, make that courier our new target
+    if (courier !== null && !creep.pos.isNearTo(target)) {
+      // console.log`  found a courier! (${courier})`)
+      target = courier;
+      target.memory.courier = true;
+    }
+
+    // If we're near to the target, either give it our energy or drop it
+    // At this point our target can be a spawn, extension, or a courier.
+    if (creep.pos.isNearTo(target)) {
+      // console.log(`  transferring energy to ${target}`)
+      if (creep.transfer(target, RESOURCE_ENERGY) !== OK) {
+        // console.log(`  dropping nrg`);
+        creep.drop(RESOURCE_ENERGY);
+      }
+    } else {
+      // console.log(`  moving to ${target.name}`);
+      creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
+    }
+  },
+
   assignMiner() {
     // console.log(`  assigning a miner`);
     const { creep } = this;
 
     const miner = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
       filter(dude) {
-        if (dude.memory.role === 'miner' && dude.memory.helpers.length < dude.memory.helpersNeeded) { return true; }
-
+        if (dude.memory.role === 'miner' &&
+        dude.memory.helpers.length < dude.memory.helpersNeeded) {
+          return true;
+        }
         return false;
       },
     });
@@ -28,46 +76,18 @@ module.exports = {
     miner.memory.helpers.push(creep.id);
   },
 
-  action() {
+  courierCheck() {
     const { creep } = this;
-    // console.log(`${creep.name}`);
 
-    if (creep.memory.courier !== undefined && creep.memory.courier === true) {
+    if (creep.memory.courier === true) {
       creep.memory.courier = false;
-      return;
+      return true;
     }
+    return false;
+  },
 
-    // If this helper isn't assigned to a miner, find one and assign him to it.
-    // If it is assigned to a miner, then find that miner by his id
-    if (creep.memory.miner === undefined) { this.assignMiner(); }
-
-    const miner = Game.getObjectById(creep.memory.miner);
-    // console.log`  miner: ${miner}`);
-    if (miner == null) {
-      creep.suicide();
-      return;
-    }
-
-    // If we can still pick up energy, let's do that
-    if (_.sum(creep.carry) < creep.carryCapacity) {
-      if (creep.pos.isNearTo(miner)) {
-        const energy = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
-
-        if (energy) {
-          // console.log(`  picking up ${energy}`);
-          creep.pickup(energy);
-        }
-      } else if (miner.memory.isNearSource) {
-        // console.log(`  moving to ${miner}`);
-        creep.moveTo(miner, { visualizePathStyle: { stroke: '#ffaa00' } });
-      }
-      return;
-    }
-
-    let target = this.findATarget();
-    // Okay, everything below is for dropping energy off
-
-    // console.log(`  target: ${target}`)
+  findACourier(target) {
+    const { creep } = this;
     // Let's get the direction we want to go in
     const targetDirection = creep.pos.findPathTo(target, { ignoreCreeps: true })[0].direction;
 
@@ -98,43 +118,10 @@ module.exports = {
       },
     });
 
-    // If we found a courier, make that courier our new target
-    if (courier !== null && !creep.pos.isNearTo(target)) {
-      // console.log`  found a courier! (${courier})`)
-      target = courier;
-      target.memory.courier = true;
-    }
-
-    // If we're near to the target, either give it our energy or drop it
-    // At this point our target can be a spawn, extension, or a courier.
-    if (creep.pos.isNearTo(target)) {
-      let nrg;
-      let caps;
-
-      if (target instanceof Creep) {
-        nrg = target.carry.energy;
-        caps = target.carryCapacity;
-      } else if (target instanceof StructureContainer || target instanceof StructureStorage) {
-        nrg = target.store[RESOURCE_ENERGY];
-        caps = target.storeCapacity;
-      } else {
-        nrg = target.energy;
-        caps = target.energyCapacity;
-      }
-
-      if (nrg < caps) {
-        // console.log(`  transferring energy to ${target}`)
-        creep.transfer(target, RESOURCE_ENERGY);
-      } else {
-        // console.log(`  dropping nrg`);
-        creep.drop(RESOURCE_ENERGY);
-      }
-    } else {
-      // console.log(`  moving to ${target.name}`);
-      creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
-    }
+    return courier;
   },
 
+  // TODO: Refactor this to be more DRY
   findATarget() {
     // console.log(`  findATarget`)
     const { creep } = this;
@@ -171,11 +158,34 @@ module.exports = {
     return spawn;
   },
 
+  grabDroppedEnergy() {
+    const { creep } = this;
+    const miner = Game.getObjectById(creep.memory.miner);
+
+    // If we can still pick up energy, let's do that
+    if (_.sum(creep.carry) < creep.carryCapacity) {
+      if (creep.pos.isNearTo(miner)) {
+        const energy = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
+
+        if (energy) {
+          // console.log(`  picking up ${energy}`);
+          creep.pickup(energy);
+          return true;
+        }
+      } else if (miner.memory.isNearSource) {
+        // console.log(`  moving to ${miner}`);
+        creep.moveTo(miner, { visualizePathStyle: { stroke: '#ffaa00' } });
+        return true;
+      }
+    }
+    return false;
+  },
+
   checkExtensions(room) {
     // console.log(`    checkExtensions(${spawn})`)
     let target = null;
-    if (room === undefined) {
-      return;
+    if (room == null) {
+      return null;
     }
 
     // console.log("  checkig extensions...")
@@ -183,13 +193,14 @@ module.exports = {
       filter: { structureType: STRUCTURE_EXTENSION },
     });
 
-    extensions.forEach((ext) => {
+    for (let i = 0; i < extensions.length; i += 1) {
+      const ext = extensions[i];
       if (ext.isActive() && (ext.energy < ext.energyCapacity)) {
         // console.log(`  assigning ${ext} as target`)
         target = ext;
-        return;
+        break;
       }
-    });
+    }
     return target;
   },
 
@@ -211,7 +222,7 @@ module.exports = {
       filter: { structureType: type },
     });
 
-    for (const i in thingies) {
+    for (let i = 0; i < thingies.length; i += 1) {
       const thing = thingies[i];
       // console.log(`  container: ${thing}`);
       if (thing.isActive() && thing.store[RESOURCE_ENERGY] < thing.storeCapacity) {
@@ -229,7 +240,7 @@ module.exports = {
       filter: { structureType: STRUCTURE_TOWER },
     });
     let target = null;
-    for (const i in towers) {
+    for (let i = 0; i < towers.length; i += 1) {
       const tower = towers[i];
       if (tower.isActive() && tower.energy < tower.energyCapacity - 100) {
         target = tower;

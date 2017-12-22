@@ -13,7 +13,7 @@ const warrior = {
       }
     }
 
-    if (target === null) { return this.rest(); }
+    if (target === null) { this.rest(); }
   },
 };
 

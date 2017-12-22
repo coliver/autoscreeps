@@ -1,6 +1,8 @@
 // Finds a source, and stays near it.
 // His job is just to mine away and let the energy fall on the ground
 const miner = {
+  MAX_HELPERS: 5,
+
   parts: [
     [MOVE, WORK, WORK],
     [MOVE, WORK, WORK, WORK, WORK],
@@ -62,8 +64,8 @@ const miner = {
     const steps = helperSpawn.pos.findPathTo(source).length * 2;
     let creepsNeeded = Math.round((steps * 8) / 100);
 
-    if (creepsNeeded > 5) {
-      creepsNeeded = 5;
+    if (creepsNeeded > this.MAX_HELPERS) {
+      creepsNeeded = this.MAX_HELPERS;
     }
 
     for (let i = 0; i < creepsNeeded; i += 1) {

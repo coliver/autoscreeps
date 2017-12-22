@@ -1,11 +1,10 @@
 const countType = require('countType');
 
 module.exports = {
-  // FIXME
-  theRoom: null, // Game.rooms.W32S12,
+  theRoom: null,
 
   init() {
-    if (Memory.factoryInit !== undefined) {
+    if (Memory.factoryInit != null) {
       return;
     }
 
@@ -18,13 +17,12 @@ module.exports = {
     this.spawnRequiredScreeps();
   },
 
-  // TODO: This is 1 room only.
   forceMiners() {
     // console.log(`factory.forceMiners`);
     // If nothing is in the queue, return
     const { spawnQue } = Memory;
 
-    if (spawnQue === undefined || !spawnQue.length) {
+    if (spawnQue == null || !spawnQue.length) {
       // console.log(`  Spawnque undefined!`);
       return;
     }
@@ -152,32 +150,12 @@ module.exports = {
         Memory.spawnQue.push(role);
       }
     });
-
-    // for (const role in requiredCounts) {
-    //   // console.log(`    role: ${role} ${requiredCounts[role]}`);
-    //   const requiredCount = requiredCounts[role];
-    //   const actualCount = countType(role, true);
-    //   // console.log(`    actualCount: ${actualCount}`);
-    //
-    //   if (actualCount > requiredCount) {
-    //     // remove some shit from the queue.
-    //     const datIndex = Memory.spawnQue.indexOf(role);
-    //     if (datIndex !== -1) {
-    //       // console.log(`  removing ${role} from spawnque`);
-    //       Memory.spawnQue.splice(datIndex, 1);
-    //       this.spawnRequiredScreeps();
-    //     }
-    //   } else if (actualCount < requiredCount) {
-    //     // console.log(`  pushing ${role} to spawnque`);
-    //     Memory.spawnQue.push(role);
-    //   }
-    // }
   },
 
   buildArmyWhileIdle() {
-    for (const i in Game.spawns) {
+    for (let i = 0; i < Game.spawns.length; i += 1) {
       const spawn = Game.spawns[i];
-      if (!spawn.spawning && Memory.spawnQue.length == 0 && spawn.energy / spawn.energyCapacity >= 0.6) {
+      if (!spawn.spawning && Memory.spawnQue.length === 0 && spawn.energy / spawn.energyCapacity >= 0.6) {
         const archers = countType('archer', true);
         const healers = countType('healer', true);
 
@@ -195,5 +173,6 @@ module.exports = {
         }
       }
     }
+    return null;
   },
 };

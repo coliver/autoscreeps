@@ -44,22 +44,19 @@ const spawner = {
       Memory.spawnQue.shift();
     }
   },
-
-  spawn(role, memory, spawnPoint) {
-    if (!spawnPoint) { spawnPoint = Game.spawns.Spawn1; }
-
+  // FIXME: Do not depend on Spawn1!
+  spawn(role, desiredMemory = {}, spawnPoint = Game.spawns.Spawn1) {
+    const memory = desiredMemory;
     const manager = require('roleManager');
 
     if (!manager.roleExists(role)) {
-      return;
+      return false;
     }
 
     if (!this.canSpawn(spawnPoint, role)) {
       console.log(`${spawnPoint} can't spawn ${role}`);
-      return;
+      return false;
     }
-
-    if (memory == null) { memory = { }; }
 
     memory.role = role;
 
@@ -88,9 +85,7 @@ const spawner = {
       return false;
     }
 
-    return spawnPoint.room.energyAvailable >= cost
-      && (spawnPoint.spawning == null
-        || spawnPoint.spawning == undefined);
+    return spawnPoint.room.energyAvailable >= cost && spawnPoint.spawning == null;
   },
 
   spawnCost(role) {
@@ -98,7 +93,7 @@ const spawner = {
     const parts = manager.getRoleBodyParts(role);
     // console.log(JSON.stringify(parts))
     let total = 0;
-    for (const index in parts) {
+    for (let index = 0; index < parts.length; index += 1) {
       const part = parts[index];
       switch (part) {
         case MOVE:
@@ -132,6 +127,9 @@ const spawner = {
         case CLAIM:
           total += 600;
           break;
+
+        default:
+          throw new Error(`Unexpected part in spawnCost: ${part}`);
       }
     }
 
@@ -139,8 +137,8 @@ const spawner = {
   },
 
   killAll(role) {
-    for (const i in Game.creeps) {
-      if (role == undefined || Game.creeps[i].memory.role == role) {
+    for (let i = 0; i < Game.creeps.length; i += 1) {
+      if (role == null || Game.creeps[i].memory.role === role) {
         console.log(`killing: ${Game.creeps[i].name}`);
         Game.creeps[i].suicide();
       }

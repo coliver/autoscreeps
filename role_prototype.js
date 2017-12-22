@@ -32,7 +32,7 @@ const proto = {
   },
 
   placeRoad() {
-    const { creep } = this
+    const { creep } = this;
 
     creep.room.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
   },
@@ -54,6 +54,7 @@ const proto = {
   getParts() {
     const _ = require('lodash');
 
+    // FIXME: Do not rely on Spawn1 :C
     const potentialEnergy = Game.spawns.Spawn1.room.energyCapacityAvailable;
 
     const parts = _.cloneDeep(this.parts);
@@ -67,7 +68,13 @@ const proto = {
 
     let chosenParts = null;
 
-    for (const i in parts) {
+    // for (const i in parts) {
+    //   if (this.spawnCost(parts[i]) <= potentialEnergy) {
+    //     chosenParts = parts[i];
+    //     break;
+    //   }
+    // }
+    for (let i = 0; i < parts.length; i += 1) {
       if (this.spawnCost(parts[i]) <= potentialEnergy) {
         chosenParts = parts[i];
         break;
@@ -75,7 +82,7 @@ const proto = {
     }
 
     if (chosenParts === null) {
-      throw 'Couldn\'t find parts to work with!';
+      throw new Error('Couldn\'t find parts to work with!');
     }
 
     return chosenParts;
@@ -102,8 +109,8 @@ const proto = {
     let restTarget = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
 
     if (!civilian) {
-      const flags = Game.flags;
-      for (const i in flags) {
+      const { flags } = Game;
+      for (let i = 0; i < flags.length; i += 1) {
         const flag = flags[i];
         if (creep.pos.inRangeTo(flag, distance) || creep.pos.findPathTo(flag).length > 0) {
           restTarget = flag;
@@ -137,7 +144,7 @@ const proto = {
    */
   rangedAttack(target) {
     // console.log(`  rangedAttack(${target})`);
-    const creep = this.creep;
+    const { creep } = this;
 
     if (!target) {
       // console.log('    find target!');
@@ -162,7 +169,9 @@ const proto = {
     // console.log(target);
     if (target !== null && target.pos.inRangeTo(creep.pos, 4)) {
       // console.log("RUN AWAY")
-      creep.moveTo(creep.pos.x + creep.pos.x - target.pos.x, creep.pos.y + creep.pos.y - target.pos.y, { visualizePathStyle: { stroke: '#ffaa00' } });
+      const moveToX = (creep.pos.x + creep.pos.x) - target.pos.x;
+      const moveToY = (creep.pos.y + creep.pos.y) - target.pos.y;
+      creep.moveTo(moveToX, moveToY, { visualizePathStyle: { stroke: '#ffaa00' } });
     }
   },
 
@@ -174,7 +183,9 @@ const proto = {
     const { creep } = this;
 
     if (target.pos.inRangeTo(creep.pos, 2)) {
-      creep.moveTo(creep.pos.x + creep.pos.x - target.pos.x, creep.pos.y + creep.pos.y - target.pos.y, { visualizePathStyle: { stroke: '#ffaa00' } });
+      const moveToX = (creep.pos.x + creep.pos.x) - target.pos.x;
+      const moveToY = (creep.pos.y + creep.pos.y) - target.pos.y;
+      creep.moveTo(moveToX, moveToY, { visualizePathStyle: { stroke: '#ffaa00' } });
       return true;
     } else if (target.pos.inRangeTo(creep.pos, 3)) {
       return true;
@@ -233,7 +244,7 @@ const proto = {
 
   spawnCost(parts) {
     let total = 0;
-    for (const index in parts) {
+    for (let index = 0; index < parts.length; index += 1) {
       const part = parts[index];
       switch (part) {
         case MOVE:
@@ -267,6 +278,9 @@ const proto = {
         case CLAIM:
           total += 600;
           break;
+
+        default:
+          throw new Error(`Unexpectecd Body Part: ${part}`);
       }
     }
 

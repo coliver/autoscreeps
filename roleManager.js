@@ -2,7 +2,7 @@ module.exports = {
   roleExists(role) {
     // console.log("roleManager.roleExists")
     try {
-      require("roles_" + role);
+      require(`roles_${role}`);
       return true;
     } catch (e) {
       console.log(role);
@@ -21,7 +21,7 @@ module.exports = {
 
     const proto = require('role_prototype');
 
-    let roleObject = require("roles_" + role);
+    let roleObject = require(`roles_${role}`);
     roleObject = require('extend')(roleObject, proto);
     return roleObject;
   },
