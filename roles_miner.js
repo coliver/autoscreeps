@@ -86,45 +86,46 @@ const miner = {
     creep.memory.isNearSource = false;
     creep.memory.helpers = [];
 
-    const source = this.getOpenSource();
-    this.setSourceToMine(source);
-    this.createHelpers(source);
+    this.setSource();
+    this.createHelpers(creep.memory.source);
 
     creep.memory.onSpawned = true;
+  },
+
+  setSource() {
+    const { creep } = this;
+
+    if (creep.memory.source == null) {
+      this.setSourceToMine(this.getOpenSource());
+    }
   },
 
   action() {
     // console.log`${this.creep.name} action`)
     const { creep } = this;
 
+    this.setSource();
+
     // Basically, each miner can empty a whole source by themselves.
     // Since they're slow, we don't have them moving away from the source when
     // it's empty, it'd regenerate before they got to another one. For this, we
     // assign one miner to one source, and they stay with it
-    let source = Game.getObjectById(creep.memory.source);
+    const source = Game.getObjectById(creep.memory.source);
 
     if (source == null) {
-      source = this.getOpenSource();
-
-      if (!source) {
-        return;
-      }
-
-      this.setSourceToMine(source);
+      return;
     }
 
-    if (creep.pos.inRangeTo(source, 5)) {
-      creep.memory.isNearSource = true;
-    } else {
-      creep.memory.isNearSource = false;
-    }
+    creep.memory.isNearSource = creep.pos.inRangeTo(source, 5);
 
     if (Memory.sources[source.id] == null) {
       Memory.sources[source.id] = { id: source.id };
     }
     Memory.sources[source.id].miner = creep.id;
-    // console.log`${this.creep.name} action Moving to ${source}!`)
+
+    // If we are near a source, make a container.
     if (creep.pos.isNearTo(source)) {
+      // TODO: Check if the miner is on top of a container first
       creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
       creep.harvest(source);
     } else {
