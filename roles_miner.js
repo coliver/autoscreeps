@@ -3,6 +3,8 @@
 const miner = {
   MAX_HELPERS: 5,
 
+  myColor: '#ffaa00',
+
   parts: [
     [MOVE, WORK, WORK],
     [MOVE, WORK, WORK, WORK, WORK],
@@ -123,9 +125,10 @@ const miner = {
     Memory.sources[source.id].miner = creep.id;
     // console.log`${this.creep.name} action Moving to ${source}!`)
     if (creep.pos.isNearTo(source)) {
+      creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
       creep.harvest(source);
     } else {
-      creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+      creep.moveTo(source, { visualizePathStyle: { stroke: this.myColor } });
     }
 
     this.keepAwayFromEnemies();

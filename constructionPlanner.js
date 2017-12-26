@@ -26,9 +26,9 @@ const constructionPlanner = {
   buildRoads(from, to) {
     // console.log(`buildRoads(${from}, ${to})`)
     const path = this.theRoom.findPath(from, to, { ignoreCreeps: true });
-    // console.log(`    ${JSON.stringify(path)} = this.theRoom.findPath(from, to, { ignoreCreeps: true });`)
-    for (const i in path) {
-      const result = this.theRoom.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
+    // console.log(`${JSON.stringify(path)} = this.theRoom.findPath(from, to, { ignoreCreeps: true });`)
+    for (let i = 0; i < path.length; i += 1) {
+      this.theRoom.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
       // console.log(`    ${result} = createConstructionSite(${path[i].x}, ${path[i].y})`);
     }
   },
@@ -38,7 +38,7 @@ const constructionPlanner = {
     // console.log("buildRoadToAllSources!")
     const sources = this.theRoom.find(FIND_SOURCES_ACTIVE);
 
-    for (const i in sources) {
+    for (let i = 0; i < sources.length; i += 1) {
       // TODO: Replace hard coded call
       this.buildRoads(Game.spawns.Spawn1.pos, sources[i].pos);
     }
@@ -48,7 +48,7 @@ const constructionPlanner = {
   killAllNonStartedSites() {
     const sites = this.theRoom.find(FIND_CONSTRUCTION_SITES);
 
-    for (const i in sites) {
+    for (let i = 0; i < sites.length; i += 1) {
       const site = sites[i];
       console.log(JSON.stringify(site));
 

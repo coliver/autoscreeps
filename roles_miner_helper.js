@@ -125,37 +125,11 @@ module.exports = {
   findATarget() {
     // console.log(`  findATarget`)
     const { creep } = this;
-    let target = null;
-
-    const spawn = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
-
-    target = this.checkExtensions(creep.room);
-    if (target) {
-      // console.log(`  extension wins: (${target})`)
-      return target;
-    }
-
-    target = this.checkTowers(creep.room);
-    if (target) {
-      // console.log(`  tower wins: (${target})`)
-      return target;
-    }
-
-    target = this.checkContainers(creep.room);
-    // STRUCTURE_CONTAINERs
-    if (target) {
-      // console.log(`  container wins: (${target})`)
-      return target;
-    }
-
-    target = this.checkStorage(creep.room);
-    if (target) {
-      // console.log(`  storage wins: (${target})`)
-      return target;
-    }
-
-    // console.log(`No one wins :C target: ${spawn}`)
-    return spawn;
+    return this.checkExtensions(creep.room) ||
+      this.checkTowers(creep.room) ||
+      this.checkContainers(creep.room) ||
+      this.checkStorage(creep.room) ||
+      creep.pos.findClosestByRange(FIND_MY_SPAWNS);
   },
 
   grabDroppedEnergy() {
@@ -179,75 +153,6 @@ module.exports = {
       }
     }
     return false;
-  },
-
-  checkExtensions(room) {
-    // console.log(`    checkExtensions(${spawn})`)
-    let target = null;
-    if (room == null) {
-      return null;
-    }
-
-    // console.log("  checkig extensions...")
-    const extensions = room.find(FIND_MY_STRUCTURES, {
-      filter: { structureType: STRUCTURE_EXTENSION },
-    });
-
-    for (let i = 0; i < extensions.length; i += 1) {
-      const ext = extensions[i];
-      if (ext.isActive() && (ext.energy < ext.energyCapacity)) {
-        // console.log(`  assigning ${ext} as target`)
-        target = ext;
-        break;
-      }
-    }
-    return target;
-  },
-
-  checkContainers(room) {
-    // console.log(`    checkContainers(${room})`);
-    return this.checkStorageTypeThing(STRUCTURE_CONTAINER, room);
-  },
-
-  checkStorage(room) {
-    // console.log(`    checkStorage(${room})`);
-    return this.checkStorageTypeThing(STRUCTURE_STORAGE, room);
-  },
-
-  // Type can be STRUCTURE_CONTAINER or STRUCTURE_STORAGE
-  checkStorageTypeThing(type, room) {
-    // console.log(`      checkStorageTypeThing(${type})`)
-    let target = null;
-    const thingies = room.find(FIND_STRUCTURES, {
-      filter: { structureType: type },
-    });
-
-    for (let i = 0; i < thingies.length; i += 1) {
-      const thing = thingies[i];
-      // console.log(`  container: ${thing}`);
-      if (thing.isActive() && thing.store[RESOURCE_ENERGY] < thing.storeCapacity) {
-        target = thing;
-        break;
-      }
-    }
-    // console.log(`  ${target}`)
-    return target;
-  },
-
-  checkTowers(room) {
-    // console.log(`  checkTowers(${room})`);
-    const towers = room.find(FIND_MY_STRUCTURES, {
-      filter: { structureType: STRUCTURE_TOWER },
-    });
-    let target = null;
-    for (let i = 0; i < towers.length; i += 1) {
-      const tower = towers[i];
-      if (tower.isActive() && tower.energy < tower.energyCapacity - 100) {
-        target = tower;
-        break;
-      }
-    }
-    return target;
   },
 };
 
