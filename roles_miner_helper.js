@@ -121,7 +121,6 @@ module.exports = {
     return courier;
   },
 
-  // TODO: Refactor this to be more DRY
   findATarget() {
     // console.log(`  findATarget`)
     const { creep } = this;

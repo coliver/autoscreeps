@@ -153,24 +153,29 @@ module.exports = {
   },
 
   buildArmyWhileIdle() {
+    if (Memory.spawnQue.length > 0) { return null; }
+    const spawner = require('spawner');
+
     for (let i = 0; i < Game.spawns.length; i += 1) {
       const spawn = Game.spawns[i];
-      if (!spawn.spawning && Memory.spawnQue.length === 0 && spawn.energy / spawn.energyCapacity >= 0.6) {
+      const ratio = spawn.energy / spawn.energyCapacity;
+
+      if (!spawn.spawning && (ratio >= 0.6)) {
         const archers = countType('archer', true);
         const healers = countType('healer', true);
 
         if (archers === 0) {
-          return require('spawner').spawn('archer', { }, spawn);
+          return spawner.spawn('archer', { }, spawn);
         }
         if (healers === 0) {
-          return require('spawner').spawn('healer', { }, spawn);
+          return spawner.spawn('healer', { }, spawn);
         }
 
         if (healers / archers < 0.25) {
-          require('spawner').spawn('healer', { }, spawn);
-        } else {
-          require('spawner').spawn('archer', { }, spawn);
+          return spawner.spawn('healer', { }, spawn);
         }
+
+        return spawner.spawn('archer', { }, spawn);
       }
     }
     return null;
