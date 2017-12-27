@@ -99,6 +99,10 @@ const miner = {
 
     const steps = helperSpawn.pos.findPathTo(source).length * 2;
     let creepsNeeded = Math.round((steps * 8) / 100);
+    console.log(`creepsNeeded: ${creepsNeeded}`);
+    if (creepsNeeded <= 1) {
+      creepsNeeded = 1;
+    }
 
     if (creepsNeeded > this.MAX_HELPERS) {
       creepsNeeded = this.MAX_HELPERS;
