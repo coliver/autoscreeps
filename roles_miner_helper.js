@@ -10,6 +10,8 @@ module.exports = {
     [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
   ],
 
+  myColor: '#ffaa00',
+
   action() {
     const { creep } = this;
     // console.log(`${creep.name}`);
@@ -34,7 +36,7 @@ module.exports = {
 
     let target = this.findATarget();
 
-    const courier = this.findACourier();
+    const courier = this.findACourier(target);
     // If we found a courier, make that courier our new target
     if (courier !== null && !creep.pos.isNearTo(target)) {
       // console.log`  found a courier! (${courier})`)
@@ -52,7 +54,7 @@ module.exports = {
       }
     } else {
       // console.log(`  moving to ${target.name}`);
-      creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
+      creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
     }
   },
 
@@ -131,6 +133,75 @@ module.exports = {
       creep.pos.findClosestByRange(FIND_MY_SPAWNS);
   },
 
+  checkExtensions(room) {
+    // console.log(`    checkExtensions(${spawn})`)
+    let target = null;
+    if (room == null) {
+      return null;
+    }
+
+    // console.log("  checkig extensions...")
+    const extensions = room.find(FIND_MY_STRUCTURES, {
+      filter: { structureType: STRUCTURE_EXTENSION },
+    });
+
+    for (let i = 0; i < extensions.length; i += 1) {
+      const ext = extensions[i];
+      if (ext.isActive() && (ext.energy < ext.energyCapacity)) {
+        // console.log(`  assigning ${ext} as target`)
+        target = ext;
+        break;
+      }
+    }
+    return target;
+  },
+
+  checkTowers(room) {
+  // console.log(`  checkTowers(${room})`);
+    const towers = room.find(FIND_MY_STRUCTURES, {
+      filter: { structureType: STRUCTURE_TOWER },
+    });
+    let target = null;
+    for (let i = 0; i < towers.length; i += 1) {
+      const tower = towers[i];
+      if (tower.isActive() && tower.energy < tower.energyCapacity - 100) {
+        target = tower;
+        break;
+      }
+    }
+    return target;
+  },
+
+  checkContainers(room) {
+    // console.log(`    checkContainers(${room})`);
+    return this.checkStorageTypeThing(STRUCTURE_CONTAINER, room);
+  },
+
+  checkStorage(room) {
+    // console.log(`    checkStorage(${room})`);
+    return this.checkStorageTypeThing(STRUCTURE_STORAGE, room);
+  },
+
+  // Type can be STRUCTURE_CONTAINER or STRUCTURE_STORAGE
+  checkStorageTypeThing(type, room) {
+    // console.log(`      checkStorageTypeThing(${type})`)
+    let target = null;
+    const thingies = room.find(FIND_STRUCTURES, {
+      filter: { structureType: type },
+    });
+
+    for (let i = 0; i < thingies.length; i += 1) {
+      const thing = thingies[i];
+      // console.log(`  container: ${thing}`);
+      if (thing.isActive() && thing.store[RESOURCE_ENERGY] < thing.storeCapacity) {
+        target = thing;
+        break;
+      }
+    }
+    // console.log(`  ${target}`)
+    return target;
+  },
+
   grabDroppedEnergy() {
     const { creep } = this;
     const miner = Game.getObjectById(creep.memory.miner);
@@ -147,7 +218,7 @@ module.exports = {
         }
       } else if (miner.memory.isNearSource) {
         // console.log(`  moving to ${miner}`);
-        creep.moveTo(miner, { visualizePathStyle: { stroke: '#ffaa00' } });
+        creep.moveTo(miner, { visualizePathStyle: { stroke: this.myColor } });
         return true;
       }
     }
