@@ -11,95 +11,6 @@ const miner = {
     [MOVE, WORK, WORK, WORK, WORK, WORK],
   ],
 
-  beforeAge() {
-    const { creep } = this;
-
-    // Cleanup memory
-    if (Memory.sources[creep.memory.source].miner === creep.id) {
-      delete Memory.sources[creep.memory.source].miner;
-    }
-  },
-
-  getOpenSource() {
-    // console.log("creep.getOpenSource")
-    const { creep } = this;
-
-    return creep.pos.findClosestByRange(FIND_SOURCES, {
-      filter(source) {
-        const memorySource = Memory.sources[source.id];
-
-        if (memorySource == null || memorySource.miner == null || memorySource.miner === creep.id) {
-          return true;
-        }
-
-        if (Game.getObjectById(memorySource.miner) == null) {
-          return true;
-        }
-
-        return false;
-      },
-    });
-  },
-
-  setSourceToMine(source) {
-    // console.log(`  setSourceToMine(${source})`)
-    const { creep } = this;
-    const memorySources = Memory.sources;
-    const sourceId = source.id;
-
-    if (!source) {
-      return;
-    }
-
-    if (memorySources[sourceId] == null) {
-      memorySources[sourceId] = { id: sourceId };
-    }
-
-    memorySources[sourceId].miner = creep.id;
-    creep.memory.source = sourceId;
-  },
-
-  createHelpers(source) {
-    const { creep } = this;
-    const helperSpawn = source.pos.findClosestByRange(FIND_MY_SPAWNS);
-
-    const steps = helperSpawn.pos.findPathTo(source).length * 2;
-    let creepsNeeded = Math.round((steps * 8) / 100);
-
-    if (creepsNeeded > this.MAX_HELPERS) {
-      creepsNeeded = this.MAX_HELPERS;
-    }
-
-    for (let i = 0; i < creepsNeeded; i += 1) {
-      Memory.spawnQue.unshift({
-        type: 'miner_helper',
-        memory: { miner: creep.id },
-      });
-    }
-    creep.memory.helpersNeeded = creepsNeeded;
-  },
-
-  onSpawn() {
-    // console.log"creep.onSpawn");
-    const { creep } = this;
-
-    creep.memory.isNearSource = false;
-    creep.memory.helpers = [];
-
-    this.setSource();
-    this.createHelpers(creep.memory.source);
-
-    creep.memory.onSpawned = true;
-  },
-
-  setSource() {
-    const { creep } = this;
-
-    if (creep.memory.source == null) {
-      this.setSourceToMine(this.getOpenSource());
-    }
-  },
-
   action() {
     // console.log`${this.creep.name} action`)
     const { creep } = this;
@@ -133,6 +44,90 @@ const miner = {
     }
 
     this.keepAwayFromEnemies();
+  },
+
+  beforeAge() {
+    const { creep } = this;
+
+    // Cleanup memory
+    if (Memory.sources[creep.memory.source].miner === creep.id) {
+      delete Memory.sources[creep.memory.source].miner;
+    }
+  },
+
+  getOpenSource() {
+    const { creep } = this;
+
+    return creep.pos.findClosestByRange(FIND_SOURCES, {
+      filter: (source) => {
+        const memorySource = Memory.sources[source.id];
+
+        if (memorySource == null || memorySource.miner == null || memorySource.miner === creep.id) {
+          return true;
+        }
+
+        if (Game.getObjectById(memorySource.miner) == null) {
+          return true;
+        }
+
+        return false;
+      },
+    });
+  },
+
+  setSourceToMine(source) {
+    const { creep } = this;
+    const memorySources = Memory.sources;
+    const sourceId = source.id;
+
+    if (!source) {
+      return;
+    }
+
+    if (memorySources[sourceId] == null) {
+      memorySources[sourceId] = { id: sourceId };
+    }
+
+    memorySources[sourceId].miner = creep.id;
+    creep.memory.source = sourceId;
+  },
+
+  createHelpers(sourceName) {
+    const { creep } = this;
+    const source = Game.getObjectById(sourceName);
+    const helperSpawn = source.pos.findClosestByRange(FIND_MY_SPAWNS);
+
+    const steps = helperSpawn.pos.findPathTo(source).length * 2;
+    let creepsNeeded = Math.round((steps * 8) / 100);
+
+    if (creepsNeeded > this.MAX_HELPERS) {
+      creepsNeeded = this.MAX_HELPERS;
+    }
+
+    for (let i = 0; i < creepsNeeded; i += 1) {
+      Memory.spawnQue.unshift({
+        type: 'miner_helper',
+        memory: { miner: creep.id },
+      });
+    }
+    creep.memory.helpersNeeded = creepsNeeded;
+  },
+
+  onSpawn() {
+    const { creep } = this;
+    creep.memory.isNearSource = false;
+    creep.memory.helpers = [];
+
+    this.setSource();
+    this.createHelpers(creep.memory.source);
+  },
+
+  setSource() {
+    const { creep } = this;
+
+    if (creep.memory.source == null) {
+      this.setSourceToMine(this.getOpenSource());
+    }
   },
 };
 
