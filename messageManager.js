@@ -17,6 +17,10 @@ const messageManager = {
   },
 
   showThingsOnDeck() {
+    if (Memory.spawnQue[0] === undefined) {
+      return;
+    }
+
     const spawns = _.filter(
       Game.spawns,
       spawn => spawn.spawning == null,
