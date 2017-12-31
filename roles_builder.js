@@ -15,7 +15,7 @@ module.exports = {
     const { creep } = this;
 
     // If out of energy, go to git sum and recharge
-    if (creep.carry.energy < creep.carryCapacity) {
+    if (creep.carry.energy === 0) {
       this.findEnergy();
       return;
     }
@@ -33,13 +33,30 @@ module.exports = {
   },
 
   findRoadSite() {
-    return this.findConstructionSites(STRUCTURE_ROAD);
+    const sites = this.findConstructionSites(STRUCTURE_ROAD);
+    if (!sites) {
+      return false;
+    }
+    const target = this.sortByProgress(sites)[0];
+    const { creep } = this;
+
+    if (!target) {
+      return false;
+    }
+
+    if (!creep.pos.isNearTo(target)) {
+      creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
+      return true;
+    }
+    creep.say(`⚒️ ${target.structureType}`);
+    creep.build(target);
+    return true;
   },
 
   closestThingWithEnergy() {
     // console.log('      closestThingWithEnergy');
-    return this.closestContainerWithEnergy() ||
-           this.closestExtensionWithEnergy();
+    return this.closestContainerWithEnergy(); // ||
+    // this.closestExtensionWithEnergy();
   },
 
   closestDroppedEnergy() {
@@ -108,16 +125,16 @@ module.exports = {
   },
 
   findATarget() {
-    let target = this.closestThingWithEnergy();
+    const target = this.closestThingWithEnergy();
 
     if (target) {
       return target;
     }
 
-    const closestSpawn = this.creep.pos.findClosestByRange(FIND_MY_SPAWNS);
-    if (closestSpawn.energy > 250) {
-      target = closestSpawn;
-    }
+    // const closestSpawn = this.creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+    // if (closestSpawn.energy > 250) {
+    //   target = closestSpawn;
+    // }
 
     return target;
   },
