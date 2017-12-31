@@ -54,9 +54,6 @@ const proto = {
   getParts() {
     const _ = require('lodash');
 
-    // FIXME: Do not rely on Spawn1 :C
-    const potentialEnergy = Game.spawns.Spawn1.room.energyCapacityAvailable;
-
     const parts = _.cloneDeep(this.parts);
 
     // If this isn't an array of arrays, return "level 1" parts
@@ -64,16 +61,16 @@ const proto = {
       return this.parts;
     }
 
+    let potentialEnergy;
+    // Everyone is dead? Go off the energy we have.
+    if (Object.keys(Game.creeps).length === 0) {
+      potentialEnergy = Game.spawns.Spawn1.room.energyAvailable;
+    } else {
+      potentialEnergy = Game.spawns.Spawn1.room.energyCapacityAvailable;
+    }
+
     parts.reverse();
-
     let chosenParts = null;
-
-    // for (const i in parts) {
-    //   if (this.spawnCost(parts[i]) <= potentialEnergy) {
-    //     chosenParts = parts[i];
-    //     break;
-    //   }
-    // }
     for (let i = 0; i < parts.length; i += 1) {
       if (this.spawnCost(parts[i]) <= potentialEnergy) {
         chosenParts = parts[i];
