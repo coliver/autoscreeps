@@ -155,9 +155,8 @@ module.exports = {
   buildArmyWhileIdle() {
     if (Memory.spawnQue.length > 0) { return null; }
     const spawner = require('spawner');
-
-    for (let i = 0; i < Game.spawns.length; i += 1) {
-      const spawn = Game.spawns[i];
+    Object.keys(Game.spawns).forEach((name) => {
+      const spawn = Game.spawns[name];
       const ratio = spawn.energy / spawn.energyCapacity;
 
       if (!spawn.spawning && (ratio >= 0.6)) {
@@ -165,19 +164,18 @@ module.exports = {
         const healers = countType('healer', true);
 
         if (archers === 0) {
+          // console.log('Spawning army archer');
           return spawner.spawn('archer', { }, spawn);
         }
-        if (healers === 0) {
-          return spawner.spawn('healer', { }, spawn);
-        }
-
-        if (healers / archers < 0.25) {
+        if (healers === 0 || healers / archers < 0.25) {
+          // console.log('Spawning army healer');
           return spawner.spawn('healer', { }, spawn);
         }
 
         return spawner.spawn('archer', { }, spawn);
       }
-    }
+      return null;
+    });
     return null;
   },
 };
