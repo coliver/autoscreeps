@@ -1,7 +1,3 @@
-/**
- * @TODO: Make it more carry heavy, make it have helpers
- * @type {{parts: *[], getParts: getParts, action: action}}
- */
 module.exports = {
   parts: [
     [WORK, CARRY, MOVE],
@@ -21,14 +17,23 @@ module.exports = {
     // If out of energy, go to git sum and recharge
     if (creep.carry.energy < creep.carryCapacity) {
       this.findEnergy();
-      return true;
+      return;
     }
 
-    return this.checkRamparts() ||
-           this.checkRepairs() ||
-           this.checkConstructionSites() ||
-           this.fixBrokenWalls() ||
-           this.rest(true);
+    if (creep.memory.isRoadWorker) {
+      this.findRoadSite();
+      creep.memory.isRoadWorker = false;
+      return;
+    }
+
+    creep.memory.isRoadWorker = !(this.checkRamparts() ||
+                          this.checkRepairs() ||
+                          this.checkConstructionSites() ||
+                          this.fixBrokenWalls());
+  },
+
+  findRoadSite() {
+    return this.findConstructionSites(STRUCTURE_ROAD);
   },
 
   closestThingWithEnergy() {
@@ -153,12 +158,10 @@ module.exports = {
 
     if (structure.pos.inRangeTo(creep.pos, 3)) {
       creep.say('🛠️ repair');
-      creep.repair(structure);
-    } else {
-      creep.moveTo(structure, { visualizePathStyle: { stroke: this.myColor } });
+      return creep.repair(structure);
     }
 
-    return true;
+    return creep.moveTo(structure, { visualizePathStyle: { stroke: this.myColor } });
   },
 
   checkConstructionSites() {
@@ -179,8 +182,18 @@ module.exports = {
   },
 
   findABuildSite() {
-    return this.findContainerSites() ||
-      this.findExtensionSites();
+    const sites = this.findExtensionSites() ||
+                  this.findContainerSites();
+    if (sites) {
+      return this.sortByProgress(sites)[0];
+    }
+    return null;
+  },
+
+  findConstructionSites(type) {
+    return this.creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
+      filter: site => site.structureType === type,
+    });
   },
 
   findContainerSites() {
@@ -189,12 +202,6 @@ module.exports = {
 
   findExtensionSites() {
     return this.findConstructionSites(STRUCTURE_EXTENSION);
-  },
-
-  findConstructionSites(type) {
-    return this.creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES, {
-      filter: site => site.structureType === type,
-    });
   },
 
   fixBrokenWalls() {
@@ -215,5 +222,12 @@ module.exports = {
       return true;
     }
     return false;
+  },
+
+  sortByProgress(sites) {
+    if (sites) {
+      return sites.sort((a, b) => b.progress - a.progress);
+    }
+    return null;
   },
 };
