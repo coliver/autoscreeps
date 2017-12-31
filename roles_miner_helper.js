@@ -8,6 +8,7 @@ module.exports = {
   parts: [
     [MOVE, CARRY, MOVE, CARRY],
     [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
+    [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
   ],
 
   myColor: '#ffaa00',
