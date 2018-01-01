@@ -17,7 +17,7 @@ module.exports = {
     });
 
     if (target) {
-      if (creep.isNearTo(target)) {
+      if (creep.pos.isNearTo(target)) {
         creep.say('💉 Healing');
         creep.heal(target);
       } else {
