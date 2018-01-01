@@ -43,6 +43,7 @@ const miner = {
       creep.moveTo(source, { visualizePathStyle: { stroke: this.myColor } });
     }
 
+    this.placeRoad();
     this.keepAwayFromEnemies();
   },
 
