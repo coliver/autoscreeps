@@ -8,7 +8,7 @@ module.exports = {
   parts: [
     [MOVE, CARRY, MOVE, CARRY],
     [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
-    [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
+    // [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
   ],
 
   myColor: '#ffaa00',
@@ -57,6 +57,7 @@ module.exports = {
       // console.log(`  moving to ${target.name}`);
       creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
     }
+    this.placeRoad();
   },
 
   assignMiner() {
@@ -126,81 +127,55 @@ module.exports = {
 
   findATarget() {
     // console.log(`  findATarget`)
-    const { creep } = this;
-    return this.checkExtensions(creep.room) ||
-      this.checkTowers(creep.room) ||
-      this.checkContainers(creep.room) ||
-      this.checkStorage(creep.room) ||
-      creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+    return this.checkExtensions() ||
+      this.checkTowers() ||
+      this.checkContainers() ||
+      this.checkStorage() ||
+      this.creep.pos.findClosestByRange(FIND_MY_SPAWNS);
   },
 
-  checkExtensions(room) {
-    // console.log(`    checkExtensions(${spawn})`)
-    let target = null;
-    if (room == null) {
-      return null;
-    }
-
-    // console.log("  checkig extensions...")
-    const extensions = room.find(FIND_MY_STRUCTURES, {
-      filter: { structureType: STRUCTURE_EXTENSION },
+  checkExtensions() {
+    // console.log("  checkExtensions")
+    const extensions = this.creep.room.find(FIND_MY_STRUCTURES, {
+      filter: structure => (structure.structureType === STRUCTURE_EXTENSION) &&
+                           (structure.energy < structure.energyCapacity),
     });
-
-    for (let i = 0; i < extensions.length; i += 1) {
-      const ext = extensions[i];
-      if (ext.isActive() && (ext.energy < ext.energyCapacity)) {
-        // console.log(`  assigning ${ext} as target`)
-        target = ext;
-        break;
-      }
-    }
-    return target;
+    if (!extensions) { return null; }
+    return this.creep.pos.findClosestByRange(extensions);
   },
 
-  checkTowers(room) {
-  // console.log(`  checkTowers(${room})`);
-    const towers = room.find(FIND_MY_STRUCTURES, {
-      filter: { structureType: STRUCTURE_TOWER },
+  checkTowers() {
+    // console.log(`  checkTowers()`);
+    const towers = this.creep.room.find(FIND_MY_STRUCTURES, {
+      filter: tower => (tower.structureType === STRUCTURE_TOWER &&
+        tower.isActive() &&
+        tower.energy < tower.energyCapacity - 100),
     });
-    let target = null;
-    for (let i = 0; i < towers.length; i += 1) {
-      const tower = towers[i];
-      if (tower.isActive() && tower.energy < tower.energyCapacity - 100) {
-        target = tower;
-        break;
-      }
-    }
-    return target;
+    if (!towers) { return null; }
+    return this.creep.pos.findClosestByRange(towers);
   },
 
-  checkContainers(room) {
-    // console.log(`    checkContainers(${room})`);
-    return this.checkStorageTypeThing(STRUCTURE_CONTAINER, room);
+  checkContainers() {
+    // console.log(`    checkContainers()`);
+    return this.checkStorageTypeThing(STRUCTURE_CONTAINER);
   },
 
-  checkStorage(room) {
-    // console.log(`    checkStorage(${room})`);
-    return this.checkStorageTypeThing(STRUCTURE_STORAGE, room);
+  checkStorage() {
+    // console.log(`    checkStorage()`);
+    return this.checkStorageTypeThing(STRUCTURE_STORAGE);
   },
 
   // Type can be STRUCTURE_CONTAINER or STRUCTURE_STORAGE
-  checkStorageTypeThing(type, room) {
+  checkStorageTypeThing(type) {
     // console.log(`      checkStorageTypeThing(${type})`)
-    let target = null;
-    const thingies = room.find(FIND_STRUCTURES, {
-      filter: { structureType: type },
+    const thingies = this.creep.room.find(FIND_STRUCTURES, {
+      filter: structure => (structure.structureType === type &&
+        structure.isActive() &&
+        structure.store[RESOURCE_ENERGY] < structure.storeCapacity),
     });
 
-    for (let i = 0; i < thingies.length; i += 1) {
-      const thing = thingies[i];
-      // console.log(`  container: ${thing}`);
-      if (thing.isActive() && thing.store[RESOURCE_ENERGY] < thing.storeCapacity) {
-        target = thing;
-        break;
-      }
-    }
-    // console.log(`  ${target}`)
-    return target;
+    if (!thingies) { return null; }
+    return this.creep.pos.findClosestByRange(thingies);
   },
 
   grabDroppedEnergy() {
