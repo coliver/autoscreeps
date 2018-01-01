@@ -26,8 +26,6 @@ const proto = {
 
     this.action(this.creep);
 
-    this.placeRoad();
-
     if (this.creep.ticksToLive === 1) { this.beforeAge(); }
   },
 
@@ -63,7 +61,8 @@ const proto = {
 
     let potentialEnergy;
     // Everyone is dead? Go off the energy we have.
-    if (Object.keys(Game.creeps).length === 0) {
+    const creepCount = Object.keys(Game.creeps).length;
+    if (creepCount === 1 || creepCount === 0) {
       potentialEnergy = Game.spawns.Spawn1.room.energyAvailable;
     } else {
       potentialEnergy = Game.spawns.Spawn1.room.energyCapacityAvailable;
@@ -116,13 +115,11 @@ const proto = {
       }
     }
 
-    //    var flag = Game.flags['Flag1'];
-    //    if(flag !== undefined && civilian !== true)
-    //      restTarget = flag;
-    //
-    //    var flag2 = Game.flags['Flag2'];
-    //    if(flag !== undefined && civilian !== true && !creep.pos.inRangeTo(flag, distance) && !creep.pos.findPathTo(flag).length)
-    //      restTarget = flag2;
+    const flag = Game.flags.Flag1;
+    if (flag !== undefined && civilian !== true) { restTarget = flag; }
+
+    const flag2 = Game.flags.Flag2;
+    if (flag !== undefined && civilian !== true && !creep.pos.inRangeTo(flag, distance) && !creep.pos.findPathTo(flag).length) { restTarget = flag2; }
 
     if (creep.getActiveBodyparts(HEAL)) {
       distance -= 1;
