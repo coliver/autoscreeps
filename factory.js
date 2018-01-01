@@ -162,16 +162,17 @@ module.exports = {
       if (!spawn.spawning && (ratio >= 0.6)) {
         const archers = countType('archer', true);
         const healers = countType('healer', true);
+        const warriors = countType('warrior', true);
 
         if (archers === 0) {
-          // console.log('Spawning army archer');
           return spawner.spawn('archer', { }, spawn);
         }
         if (healers === 0 || healers / archers < 0.25) {
-          // console.log('Spawning army healer');
           return spawner.spawn('healer', { }, spawn);
         }
-
+        if (warriors === 0 || warriors / archers < 0.25) {
+          return spawner.spawn('warrior', { }, spawn);
+        }
         return spawner.spawn('archer', { }, spawn);
       }
       return null;
