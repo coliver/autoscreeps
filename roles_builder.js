@@ -13,7 +13,7 @@ module.exports = {
 
   action() {
     const { creep } = this;
-
+    // console.log(`this.creep: ${this.creep.name}`);
     // If out of energy, go to git sum and recharge
     if (creep.carry.energy === 0) {
       this.findEnergy();
@@ -141,6 +141,7 @@ module.exports = {
 
   checkRamparts() {
     const { creep } = this;
+    // console.log('  checkRamparts');
     // First, we're going to check for damaged ramparts. We're using ramparts
     // as the first line of defense and we want them nicely maintained. This
     // is especially important when under attack. The builder will repair the
@@ -162,6 +163,7 @@ module.exports = {
 
   checkRepairs() {
     const { creep } = this;
+    // console.log('  checkRepairs');
     // Next we're going to look for general buildings that have less than 50%
     // health, and we'll go to repair those. We set it at 50%, because we
     // don't want builders abandoning their duty every time a road gets walked on
@@ -182,6 +184,7 @@ module.exports = {
   },
 
   checkConstructionSites() {
+    // console.log('  checkConstructionSites');
     const { creep } = this;
     // If no repairs are needed, we're just going to go find some structures to build
     const target = this.findABuildSite();
@@ -199,8 +202,10 @@ module.exports = {
   },
 
   findABuildSite() {
-    const sites = this.findExtensionSites() ||
-                  this.findContainerSites();
+    // console.log('    findABuildSite');
+    const sites = this.findExtensionSites() || this.findContainerSites();
+
+    // console.log(`  sites: ${sites}`);
     if (sites) {
       return this.sortByProgress(sites)[0];
     }
@@ -208,20 +213,27 @@ module.exports = {
   },
 
   findConstructionSites(type) {
-    return this.creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
+    // console.log(`        findConstructionSites(${type})`);
+    const sites = this.creep.room.find(FIND_MY_CONSTRUCTION_SITES, {
       filter: site => site.structureType === type,
     });
+    // console.log(`          sites: ${JSON.stringify(sites)}`);
+    if (sites.length === 0) { return false; }
+    return sites;
   },
 
   findContainerSites() {
+    // console.log('      findContainerSites');
     return this.findConstructionSites(STRUCTURE_CONTAINER);
   },
 
   findExtensionSites() {
+    // console.log('      findExtensionSites');
     return this.findConstructionSites(STRUCTURE_EXTENSION);
   },
 
   fixBrokenWalls() {
+    // console.log('  fixBrokenWalls');
     const { creep } = this;
     const repairit = creep.pos.findClosestByRange(FIND_STRUCTURES, {
       filter(structure) {
