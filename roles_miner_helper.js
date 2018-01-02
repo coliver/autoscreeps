@@ -13,6 +13,10 @@ module.exports = {
 
   myColor: '#ffaa00',
 
+  onSpawn() {
+    this.creep.memory.mode = 'pickup';
+  },
+
   action() {
     const { creep } = this;
     // console.log(`${creep.name}`);
@@ -31,9 +35,11 @@ module.exports = {
     }
 
     // Grab dropped energy near me or move to the miner
-    if (this.grabDroppedEnergy()) {
+    if (creep.memory.mode === 'pickup' && this.grabDroppedEnergy()) {
       return;
     }
+
+    creep.memory.mode = 'dropoff';
 
     let target = this.findATarget();
 
@@ -52,6 +58,10 @@ module.exports = {
       if (creep.transfer(target, RESOURCE_ENERGY) !== OK) {
         // console.log(`  dropping nrg`);
         creep.drop(RESOURCE_ENERGY);
+      }
+      if (_.sum(creep.carry) === 0) {
+        creep.memory.mode = 'pickup';
+        creep.say('Pickup');
       }
     } else {
       // console.log(`  moving to ${target.name}`);
@@ -198,6 +208,8 @@ module.exports = {
         return true;
       }
     }
+    creep.memory.mode = 'dropoff';
+    creep.say('Dropoff');
     return false;
   },
 };
