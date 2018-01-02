@@ -203,7 +203,7 @@ module.exports = {
 
   findABuildSite() {
     // console.log('    findABuildSite');
-    const sites = this.findExtensionSites() || this.findContainerSites();
+    const sites = this.findExtensionSites() || this.findContainerSites() || this.findTowerSites();
 
     // console.log(`  sites: ${sites}`);
     if (sites) {
@@ -230,6 +230,11 @@ module.exports = {
   findExtensionSites() {
     // console.log('      findExtensionSites');
     return this.findConstructionSites(STRUCTURE_EXTENSION);
+  },
+
+  findTowerSites() {
+    // console.log('      findExtensionSites');
+    return this.findConstructionSites(STRUCTURE_TOWER);
   },
 
   fixBrokenWalls() {
