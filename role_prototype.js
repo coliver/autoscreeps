@@ -78,7 +78,8 @@ const proto = {
     }
 
     if (chosenParts === null) {
-      throw new Error('Couldn\'t find parts to work with!');
+      return parts.reverse()[0];
+      // throw new Error('Couldn\'t find parts to work with!');
     }
 
     return chosenParts;
