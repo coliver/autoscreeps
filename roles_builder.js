@@ -203,13 +203,17 @@ module.exports = {
 
   findABuildSite() {
     // console.log('    findABuildSite');
-    const sites = this.findExtensionSites() || this.findContainerSites() || this.findTowerSites();
+    const sites = this.findExtensionSites() || this.findContainerSites() || this.findTowerSites() || this.findWallSites();
 
     // console.log(`  sites: ${sites}`);
     if (sites) {
       return this.sortByProgress(sites)[0];
     }
     return null;
+  },
+
+  findWallSites() {
+    return this.findConstructionSites(STRUCTURE_WALL);
   },
 
   findConstructionSites(type) {
