@@ -1,7 +1,9 @@
 const upgrader = {
   parts: [
-    [CARRY, WORK, MOVE, MOVE],
-    [CARRY, CARRY, WORK, MOVE, MOVE],
+    [CARRY, WORK, WORK, MOVE],
+    [CARRY, WORK, WORK, WORK, MOVE],
+    [CARRY, WORK, WORK, WORK, WORK, MOVE],
+    [CARRY, WORK, WORK, WORK, WORK, WORK, MOVE],
   ],
 
   myColor: '#ff0011',
@@ -24,7 +26,7 @@ const upgrader = {
 
     if (creep.memory.upgrading) {
       // console.log("I am upgrading..")
-      if (creep.pos.isNearTo(creep.room.controller)) {
+      if (creep.pos.inRangeTo(creep.room.controller.pos, 3)) {
         // console.log(`upgrading ${creep.room.controller}`)
         creep.upgradeController(creep.room.controller);
         return;
