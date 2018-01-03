@@ -2,6 +2,7 @@
 const transporter = {
   parts: [
     [CARRY, CARRY, WORK, MOVE],
+    [CARRY, CARRY, WORK, MOVE, MOVE, MOVE],
   ],
 
   myColor: '#fa00ff',
