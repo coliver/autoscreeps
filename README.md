@@ -17,7 +17,7 @@ This library is the AI for my creeps in the game Screeps.
   - Creeps spawn with more parts if they can (explained below)
   - Spawns soldiers when required creeps are all spawned
 - All Creeps are wise enough to run away from bad guys
-- [Miner](../blob/master/role_miner.js)
+- [Miner](role_miner.js)
   - 1 Miner is assigned to 1 source
   - Miners only mine, they don't transport
   - Creates a container construction site after settling in to mine
