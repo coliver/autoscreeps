@@ -2,16 +2,55 @@ This is heavily modified version of https://github.com/Garethp/Screeps
 
 This is always a work in progress.
 
-Overview
-=======
-This library includes a number of things, the main two of which are the are the **roles** functionality and the **spawner**.
-The spawner uses what is known as a role to make human readable aliases to spawn off of, as well as containing some
-methods to help managing the spawner. The roles are a set of classes that are made to be sharable between projects, so if
-you want to share your particular body parts config, or the AI, for a role with someone else, it should be easy to simply
-plug and play.
+# Overview
 
-Spawner
-=======
+This library is the AI for my creeps in the game Screeps.
+
+# Features
+
+- Roles system
+  - All creeps use the role_prototype.js
+  - See role_*.js for full implementation
+- Spawning creeps
+  - Works off a list of 'required' creeps \([see factory.js](blob/master/factory.js)\)
+    - Auto generates missing creeps
+  - Creeps spawn with more parts if they can (explained below)
+  - Spawns soldiers when required creeps are all spawned
+- All Creeps are wise enough to run away from bad guys
+- [Miner](blob/master/role_miner.js)
+  - 1 Miner is assigned to 1 source
+  - Miners only mine, they don't transport
+  - Creates a container construction site after settling in to mine
+  - [Miner helpers](blob/master/role_miner_helper.js) are spawned as needed to move energy
+  - Miner helpers drop construction sites for roads
+- [Builder](blob/master/role_builder.js)
+  - Repairs anything
+  - Can currently build:
+    - Extensions
+    - Containers
+    - Towers
+    - Walls
+    - Storage
+    - Roads
+- [Upgrader](blob/master/role_upgrader.js)
+  - Upgrades your controller
+  - Gets its own energy if needed
+- [Message Manager](blob/master/messageManager.js)
+  - Shows what is spawning next / currently spawning
+- [Construction Planner](blob/master/constructionPlanner.js)
+  - Can map road networks to/from sources
+  - Must be manually run
+
+And lots of other things.
+
+# TODO Features
+
+- Auto creation of construction sites for buildings
+- Auto determine what the 'requiredScreeps' list should be based on a number of factors
+- Helpers for upgraders
+
+# Spawner
+
 The spawner module has 4 methods for use. These are
 
  - spawn(role, memory)
@@ -23,8 +62,8 @@ The **role** argument here refers to a human readable name for the list of body 
 relates to the AI for that role in the file roles_{roleName}. So if you spawn a creep with the role
 of "miner" it's AI code will be located in roles_miner.js
 
-Roles
-=====
+# Roles
+
 To make things simple, each role has its own file containing its list of parts (and sometimes an
 array of these lists). This means that it should be relatively easy to simply add a new role without making your code for
 running a turn any more complicated, as the rest of the code will simply take the new role into account.
@@ -37,40 +76,37 @@ some events which you can handle. So far the code supports handling the followin
  - onSpawnEnd() *This is called when the creep has finished spawning*
  - beforeAge *This is called when the creep has one tick left*
 
-And the main AI code should go into the
+And the main AI code should go the creep's
 
  - action(creep)
 
 method.
 
-Levels
-======
+# Levels
+
 I believe one of the important features for late game screeps will be having different units depending on how much energy
-and how many extensions you have. What units you can build with only 5 parts won't really be all competitive when put
-up against what you can do with, say, 12 parts instead. For this reason, this framework supports the ability to have roles
+and how many extensions you have. What units you can build with only 5 extensions won't really be all competitive when put
+up against what you can do with, say, 12 extensions instead. For this reason, this framework supports the ability to have roles
 automatically adjust their body parts to take in to account what you're able to build. At the moment, this is implemented
-by creating an array of body parts. For example, a simple list of body parts for a creep might look like:
+by creating an array of body parts. For example, a simple list of body parts for a simple worker creep might look like:
 
 ```javascript
-[TOUGH, TOUGH, MOVE, ATTACK, ATTACK]
+[CARRY, CARRY, WORK, MOVE, MOVE]
 ```
 
-For a simple warrior. It contains 5 parts, the maximum you can build without any extensions. However, if you wanted to
-have your warriors to be built tougher if you have the extensions, you might define your parts list as such
+It contains 5 parts totaling 300 energy; the maximum you can build without any extensions. However, if you wanted to
+have your workers be better if you have the extensions, you might define your parts list as such:
 
 ```javascript
 [
-  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK],
-  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK],
-  [TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL],
-  [TOUGH, TOUGH, TOUGH, MOVE, ATTACK, ATTACK, RANGED_ATTACK, HEAL]
+  [CARRY, CARRY, WORK, MOVE, MOVE],
+  [CARRY, CARRY, WORK, WORK, MOVE, MOVE],
+  [CARRY, CARRY, WORK, WORK, MOVE, MOVE, MOVE, MOVE],  
+  [CARRY, CARRY, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE],  
 ]
 ```
 
-And when the spawner attempts to spawn your warrior, if you have no extensions, it'll try to spawn the first one, if it
-has one extension with >= 200 energy, it'll hit up the second, if you have two, the third, and if you have four, it will
-try to spawn the last definition. This way, when you set up your scripts to make sure that when a warrior dies, he should be
-replaced, it will pick the definition that fits your needs without you having to add complex logic.
+When the spawner attempts to spawn your creep, it will iterate over the parts until it finds the one it can spawn with your resources. This way, when a creep dies, they will be replaced with the definition that fits your needs without you having to add complex logic.
 
 Further more, you can see what kind of creep will be spawned with your current capabilities manually in the console. It's as simple
 as using the command
@@ -79,9 +115,9 @@ as using the command
 require('roleManager').getRoleBodyParts('warrior');
 ```
 
-And it will send you a list of body parts that suit the current situation. The logic for selecting what level can also be
-overriden by changing the .prototype.getParts() function for a role. For example, if you wanted to select a random definition
-for a warrior, instead of scaling it normally, in your roles_warrior.js file you could define
+And it will send you a list of body parts that suit the current situation. The logic for selecting what parts can also be
+overridden by changing the .prototype.getParts() function for a role. For example, if you wanted to select a random definition
+for a warrior, instead of scaling it normally, in your roles_warrior.js file you could define:
 
 ```javascript
 warrior.prototype.getParts = () => {
