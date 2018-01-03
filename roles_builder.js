@@ -17,19 +17,19 @@ module.exports = {
     // If out of energy, go to git sum and recharge
     if (creep.carry.energy === 0) {
       this.findEnergy();
-      return;
+      return null;
     }
 
     if (creep.memory.isRoadWorker) {
       this.findRoadSite();
-      creep.memory.isRoadWorker = false;
-      return;
+      return null;
     }
 
-    creep.memory.isRoadWorker = !(this.checkRamparts() ||
-                          this.checkRepairs() ||
-                          this.checkConstructionSites() ||
-                          this.fixBrokenWalls());
+    return this.checkRamparts() ||
+      this.checkRepairs() ||
+      this.checkConstructionSites() ||
+      this.fixBrokenWalls() ||
+      this.findRoadSite();
   },
 
   findRoadSite() {
@@ -203,7 +203,10 @@ module.exports = {
 
   findABuildSite() {
     // console.log('    findABuildSite');
-    const sites = this.findExtensionSites() || this.findContainerSites() || this.findTowerSites() || this.findWallSites();
+    const sites = this.findExtensionSites() ||
+      this.findContainerSites() ||
+      this.findTowerSites() ||
+      this.findWallSites();
 
     // console.log(`  sites: ${sites}`);
     if (sites) {
