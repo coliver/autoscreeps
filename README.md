@@ -12,18 +12,18 @@ This library is the AI for my creeps in the game Screeps.
   - All creeps use the role_prototype.js
   - See role_*.js for full implementation
 - Spawning creeps
-  - Works off a list of 'required' creeps \([see factory.js](blob/master/factory.js)\)
+  - Works off a list of 'required' creeps \([see factory.js](factory.js)\)
     - Auto generates missing creeps
   - Creeps spawn with more parts if they can (explained below)
   - Spawns soldiers when required creeps are all spawned
 - All Creeps are wise enough to run away from bad guys
-- [Miner](role_miner.js)
+- [Miner](roles_miner.js)
   - 1 Miner is assigned to 1 source
   - Miners only mine, they don't transport
   - Creates a container construction site after settling in to mine
-  - [Miner helpers](blob/master/role_miner_helper.js) are spawned as needed to move energy
+  - [Miner helpers](roles_miner_helper.js) are spawned as needed to move energy
   - Miner helpers drop construction sites for roads
-- [Builder](blob/master/role_builder.js)
+- [Builder](roles_builder.js)
   - Repairs anything
   - Can currently build:
     - Extensions
@@ -32,12 +32,12 @@ This library is the AI for my creeps in the game Screeps.
     - Walls
     - Storage
     - Roads
-- [Upgrader](blob/master/role_upgrader.js)
+- [Upgrader](roles_upgrader.js)
   - Upgrades your controller
   - Gets its own energy if needed
-- [Message Manager](blob/master/messageManager.js)
+- [Message Manager](messageManager.js)
   - Shows what is spawning next / currently spawning
-- [Construction Planner](blob/master/constructionPlanner.js)
+- [Construction Planner](constructionPlanner.js)
   - Can map road networks to/from sources
   - Must be manually run
 
