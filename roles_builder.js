@@ -34,15 +34,14 @@ module.exports = {
 
   findRoadSite() {
     const sites = this.findConstructionSites(STRUCTURE_ROAD);
+    const { creep } = this;
+
     if (!sites) {
+      // No roads? No road workers.
+      creep.memory.isRoadWorker = false;
       return false;
     }
     const target = this.sortByProgress(sites)[0];
-    const { creep } = this;
-
-    if (!target) {
-      return false;
-    }
 
     if (!creep.pos.isNearTo(target)) {
       creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
@@ -156,9 +155,11 @@ module.exports = {
     if (damagedRamparts.length) {
       if (damagedRamparts[0].pos.inRangeTo(creep.pos, 3)) {
         // creep.say('🛠️ rampart');
-        return creep.repair(damagedRamparts[0]);
+        creep.repair(damagedRamparts[0]);
+        return true;
       }
-      return creep.moveTo(damagedRamparts[0], { visualizePathStyle: { stroke: this.myColor } });
+      creep.moveTo(damagedRamparts[0], { visualizePathStyle: { stroke: this.myColor } });
+      return true;
     }
     return false;
   },
@@ -179,10 +180,12 @@ module.exports = {
 
     if (structure.pos.inRangeTo(creep.pos, 3)) {
       // creep.say('🛠️ repair');
-      return creep.repair(structure);
+      creep.repair(structure);
+      return true;
     }
 
-    return creep.moveTo(structure, { visualizePathStyle: { stroke: this.myColor } });
+    creep.moveTo(structure, { visualizePathStyle: { stroke: this.myColor } });
+    return true;
   },
 
   checkConstructionSites() {
@@ -193,10 +196,12 @@ module.exports = {
 
     if (target) {
       if (!creep.pos.inRangeTo(target, 3)) {
-        return creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
+        creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
+        return true;
       }
       creep.say(`⚒️ ${target.structureType}`);
-      return creep.build(target);
+      creep.build(target);
+      return true;
     }
     return false;
   },
@@ -258,7 +263,7 @@ module.exports = {
     });
 
     if (repairit) {
-      if (!creep.pos.isNearTo(repairit)) {
+      if (!creep.pos.inRangeTo(repairit, 3)) {
         creep.moveTo(repairit, { visualizePathStyle: { stroke: this.myColor } });
         return true;
       }
