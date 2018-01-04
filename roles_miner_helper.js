@@ -61,7 +61,7 @@ module.exports = {
       }
       if (_.sum(creep.carry) === 0) {
         creep.memory.mode = 'pickup';
-        creep.say('Pickup');
+        creep.say('💼 pickup');
       }
     } else {
       // console.log(`  moving to ${target.name}`);
@@ -137,11 +137,17 @@ module.exports = {
 
   findATarget() {
     // console.log(`  findATarget`)
-    return this.checkExtensions() ||
+    return this.checkSpawn() ||
+      this.checkExtensions() ||
       this.checkTowers() ||
       this.checkContainers() ||
-      this.checkStorage() ||
-      this.creep.pos.findClosestByRange(FIND_MY_SPAWNS);
+      this.checkStorage();
+  },
+
+  checkSpawn() {
+    this.creep.pos.findClosestByRange(FIND_MY_SPAWNS, {
+      filter: spawn => (spawn.energy < spawn.capacity),
+    });
   },
 
   checkExtensions() {
@@ -209,7 +215,7 @@ module.exports = {
       }
     }
     creep.memory.mode = 'dropoff';
-    creep.say('Dropoff');
+    creep.say('📦Dropoff');
     return false;
   },
 };
