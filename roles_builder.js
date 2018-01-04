@@ -141,22 +141,24 @@ module.exports = {
 
   checkRamparts() {
     const { creep } = this;
-    // console.log('  checkRamparts');
     // First, we're going to check for damaged ramparts. We're using ramparts
     // as the first line of defense and we want them nicely maintained. This
     // is especially important when under attack. The builder will repair the
     // most damaged ramparts first
+    const max = this.rampartRepairMax();
     const damagedRamparts = creep.room.find(FIND_MY_STRUCTURES, {
       filter: structure => structure.structureType === STRUCTURE_RAMPART &&
-                           structure.hits < (structure.hitsMax - 50),
+                           structure.hits < max,
     });
 
     damagedRamparts.sort((a, b) => (a.hits - b.hits));
 
     if (damagedRamparts.length) {
-      creep.moveTo(damagedRamparts[0], { visualizePathStyle: { stroke: this.myColor } });
-      creep.repair(damagedRamparts[0]);
-      return true;
+      if (damagedRamparts[0].pos.inRangeTo(creep.pos, 3)) {
+        // creep.say('🛠️ rampart');
+        return creep.repair(damagedRamparts[0]);
+      }
+      return creep.moveTo(damagedRamparts[0], { visualizePathStyle: { stroke: this.myColor } });
     }
     return false;
   },
@@ -168,7 +170,7 @@ module.exports = {
     // health, and we'll go to repair those. We set it at 50%, because we
     // don't want builders abandoning their duty every time a road gets walked on
     const toRepair = creep.room.find(FIND_MY_STRUCTURES, {
-      filter: structure => (structure.hits / structure.hitsMax) < 0.5,
+      filter: structure => (structure.hits / structure.hitsMax) < 0.5 && structure.structureType !== STRUCTURE_RAMPART,
     });
 
     if (toRepair.length === 0) { return false; }
@@ -176,7 +178,7 @@ module.exports = {
     const structure = this.creep.pos.findClosestByPath(toRepair);
 
     if (structure.pos.inRangeTo(creep.pos, 3)) {
-      creep.say('🛠️ repair');
+      // creep.say('🛠️ repair');
       return creep.repair(structure);
     }
 
@@ -190,13 +192,11 @@ module.exports = {
     const target = this.findABuildSite();
 
     if (target) {
-      if (!creep.pos.isNearTo(target)) {
-        creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
-        return true;
+      if (!creep.pos.inRangeTo(target, 3)) {
+        return creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
       }
       creep.say(`⚒️ ${target.structureType}`);
-      creep.build(target);
-      return true;
+      return creep.build(target);
     }
     return false;
   },
@@ -206,9 +206,9 @@ module.exports = {
     const sites = this.findExtensionSites() ||
       this.findContainerSites() ||
       this.findTowerSites() ||
+      this.findRampartSites() ||
       this.findWallSites();
 
-    // console.log(`  sites: ${sites}`);
     if (sites) {
       return this.sortByProgress(sites)[0];
     }
@@ -239,17 +239,21 @@ module.exports = {
     return this.findConstructionSites(STRUCTURE_EXTENSION);
   },
 
+  findRampartSites() {
+    return this.findConstructionSites(STRUCTURE_RAMPART);
+  },
+
   findTowerSites() {
     // console.log('      findExtensionSites');
     return this.findConstructionSites(STRUCTURE_TOWER);
   },
 
   fixBrokenWalls() {
-    // console.log('  fixBrokenWalls');
     const { creep } = this;
+    const max = this.wallRepairMax();
     const repairit = creep.pos.findClosestByRange(FIND_STRUCTURES, {
       filter(structure) {
-        return structure.structureType === STRUCTURE_WALL && structure.hits < this.WALL_REPAIR_MAX;
+        return structure.structureType === STRUCTURE_WALL && structure.hits < max;
       },
     });
 
@@ -258,7 +262,7 @@ module.exports = {
         creep.moveTo(repairit, { visualizePathStyle: { stroke: this.myColor } });
         return true;
       }
-      creep.say('🛠️ repair');
+      // creep.say('🛠️ repair');
       creep.repair(repairit);
       return true;
     }
@@ -270,5 +274,13 @@ module.exports = {
       return sites.sort((a, b) => b.progress - a.progress);
     }
     return null;
+  },
+
+  wallRepairMax() {
+    return (Game.gcl.level * 10000) || 0;
+  },
+
+  rampartRepairMax() {
+    3000000 * (Game.gcl.level * 0.15);
   },
 };
