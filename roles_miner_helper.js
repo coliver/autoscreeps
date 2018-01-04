@@ -145,8 +145,8 @@ module.exports = {
   },
 
   checkSpawn() {
-    this.creep.pos.findClosestByRange(FIND_MY_SPAWNS, {
-      filter: spawn => (spawn.energy < spawn.capacity),
+    return this.creep.pos.findClosestByRange(FIND_MY_SPAWNS, {
+      filter: spawn => (spawn.energy < spawn.energyCapacity),
     });
   },
 
@@ -210,7 +210,7 @@ module.exports = {
         }
       } else if (miner.memory.isNearSource) {
         // console.log(`  moving to ${miner}`);
-        creep.moveTo(miner, { visualizePathStyle: { stroke: this.myColor } });
+        creep.moveTo(miner, { visualizePathStyle: { stroke: this.myColor, opacity: 0.5 } });
         return true;
       }
     }
