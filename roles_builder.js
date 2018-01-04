@@ -210,6 +210,7 @@ module.exports = {
     // console.log('    findABuildSite');
     const sites = this.findExtensionSites() ||
       this.findContainerSites() ||
+      this.findStorageSites() ||
       this.findTowerSites() ||
       this.findRampartSites() ||
       this.findWallSites();
@@ -222,6 +223,10 @@ module.exports = {
 
   findWallSites() {
     return this.findConstructionSites(STRUCTURE_WALL);
+  },
+
+  findStorageSites() {
+    return this.findConstructionSites(STRUCTURE_STORAGE);
   },
 
   findConstructionSites(type) {
@@ -286,6 +291,6 @@ module.exports = {
   },
 
   rampartRepairMax() {
-    3000000 * (Game.gcl.level * 0.15);
+    return 3000000 * (Game.gcl.level * 0.15);
   },
 };
