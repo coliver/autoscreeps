@@ -1,6 +1,5 @@
 const towerManager = {
   theRoom: null,
-  WALL_REPAIR_MAX: 10000,
 
   manageTowers() {
     const towers = this.theRoom.find(FIND_MY_STRUCTURES, {
@@ -12,7 +11,7 @@ const towerManager = {
         filter: (structure) => {
           switch (structure.structureType) {
             case STRUCTURE_WALL:
-              return structure.hits < this.WALL_REPAIR_MAX;
+              return structure.hits < this.wallRepairMax();
             default:
               return structure.hits < structure.hitsMax;
           }
@@ -27,6 +26,10 @@ const towerManager = {
         tower.attack(closestHostile);
       }
     });
+  },
+
+  wallRepairMax() {
+    return Game.gcl.level * 10000;
   },
 };
 
