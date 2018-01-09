@@ -78,6 +78,7 @@ const proto = {
     }
 
     if (chosenParts === null) {
+      // Return the lowest parts
       return parts.reverse()[0];
       // throw new Error('Couldn\'t find parts to work with!');
     }
@@ -101,6 +102,7 @@ const proto = {
    */
   rest(civilian) {
     const { creep } = this;
+    // console.log(`${creep.name}`);
 
     let distance = 4;
     let restTarget = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
@@ -120,7 +122,11 @@ const proto = {
     if (flag !== undefined && civilian !== true) { restTarget = flag; }
 
     const flag2 = Game.flags.Flag2;
-    if (flag !== undefined && civilian !== true && !creep.pos.inRangeTo(flag, distance) && !creep.pos.findPathTo(flag).length) { restTarget = flag2; }
+    if (flag2 !== undefined && civilian !== true &&
+      !creep.pos.inRangeTo(flag, distance) &&
+      !creep.pos.findPathTo(flag).length) {
+      restTarget = flag2;
+    }
 
     if (creep.getActiveBodyparts(HEAL)) {
       distance -= 1;
@@ -138,20 +144,14 @@ const proto = {
    * @url https://bitbucket.org/Djinni/screeps/
    */
   rangedAttack(target) {
-    // console.log(`  rangedAttack(${target})`);
+    console.log(`  rangedAttack(${target})`);
     const { creep } = this;
 
-    if (!target) {
-      // console.log('    find target!');
-      target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-      // console.log(`    target: ${target}`);
-    }
+    if (!target) { return null; }
 
-    if (target) {
-      if (target.pos.inRangeTo(creep.pos, 3)) {
-        creep.rangedAttack(target);
-        return target;
-      }
+    if (target.pos.inRangeTo(creep.pos, 3)) {
+      creep.rangedAttack(target);
+      return target;
     }
     return null;
   },
@@ -176,7 +176,7 @@ const proto = {
    */
   kite(target) {
     const { creep } = this;
-
+    if (!target) { return null; }
     if (target.pos.inRangeTo(creep.pos, 2)) {
       const moveToX = (creep.pos.x + creep.pos.x) - target.pos.x;
       const moveToY = (creep.pos.y + creep.pos.y) - target.pos.y;
