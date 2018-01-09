@@ -20,7 +20,6 @@ module.exports = {
   action() {
     const { creep } = this;
     // console.log(`${creep.name}`);
-
     if (this.courierCheck()) {
       return;
     }
@@ -65,7 +64,7 @@ module.exports = {
       }
     } else {
       // console.log(`  moving to ${target.name}`);
-      creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
+      creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
     }
     this.placeRoad();
   },
@@ -141,7 +140,8 @@ module.exports = {
       this.checkExtensions() ||
       this.checkTowers() ||
       this.checkContainers() ||
-      this.checkStorage();
+      this.checkStorage() ||
+      this.creep.pos.findClosestByRange(FIND_MY_SPAWNS);
   },
 
   checkSpawn() {
@@ -210,7 +210,7 @@ module.exports = {
         }
       } else if (miner.memory.isNearSource) {
         // console.log(`  moving to ${miner}`);
-        creep.moveTo(miner, { visualizePathStyle: { stroke: this.myColor, opacity: 0.5 } });
+        creep.moveTo(miner, { reusePath: 25, visualizePathStyle: { stroke: this.myColor, opacity: 0.5 } });
         return true;
       }
     }

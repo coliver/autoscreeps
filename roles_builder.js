@@ -44,7 +44,7 @@ module.exports = {
     const target = this.sortByProgress(sites)[0];
 
     if (!creep.pos.isNearTo(target)) {
-      creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
+      creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
       return true;
     }
     creep.say(`⚒️ ${target.structureType}`);
@@ -96,7 +96,7 @@ module.exports = {
       if (creep.pos.isNearTo(target)) {
         creep.withdraw(target, RESOURCE_ENERGY);
       } else {
-        creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
+        creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
       }
       return;
     }
@@ -108,7 +108,7 @@ module.exports = {
         creep.pickup(energy);
         return;
       }
-      creep.moveTo(energy, { visualizePathStyle: { stroke: this.myColor } });
+      creep.moveTo(energy, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
       return;
     }
 
@@ -118,7 +118,7 @@ module.exports = {
         creep.say('🔄 harvest');
         creep.harvest(source);
       } else {
-        creep.moveTo(source, { visualizePathStyle: { stroke: this.myColor } });
+        creep.moveTo(source, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
       }
     }
   },
@@ -158,7 +158,7 @@ module.exports = {
         creep.repair(damagedRamparts[0]);
         return true;
       }
-      creep.moveTo(damagedRamparts[0], { visualizePathStyle: { stroke: this.myColor } });
+      creep.moveTo(damagedRamparts[0], { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
       return true;
     }
     return false;
@@ -184,7 +184,7 @@ module.exports = {
       return true;
     }
 
-    creep.moveTo(structure, { visualizePathStyle: { stroke: this.myColor } });
+    creep.moveTo(structure, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
     return true;
   },
 
@@ -196,7 +196,7 @@ module.exports = {
 
     if (target) {
       if (!creep.pos.inRangeTo(target, 3)) {
-        creep.moveTo(target, { visualizePathStyle: { stroke: this.myColor } });
+        creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
         return true;
       }
       creep.say(`⚒️ ${target.structureType}`);
@@ -269,7 +269,7 @@ module.exports = {
 
     if (repairit) {
       if (!creep.pos.inRangeTo(repairit, 3)) {
-        creep.moveTo(repairit, { visualizePathStyle: { stroke: this.myColor } });
+        creep.moveTo(repairit, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
         return true;
       }
       // creep.say('🛠️ repair');
