@@ -15,14 +15,12 @@ const archer = {
 
     const target = this.getRangedTarget();
     // console.log(`  target: ${target}`);
-    if (target !== null) {
-      creep.rangedAttack(target);
-    }
 
-    // If there's not a target near by, let's go search for a target if
-    // need be
-    if (target === null) {
-      return this.rest();
+    if (target !== null) {
+      this.rangedAttack(target);
+    } else {
+      this.rest(false);
+      return null;
     }
 
     this.kite(target);

@@ -38,8 +38,15 @@ const miner = {
     if (creep.pos.isNearTo(source)) {
       // TODO: Check if the miner is on top of a container first
       creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
-      creep.harvest(source);
+      if (creep.harvest(source) === OK) {
+        if (creep.memory._move) {
+          // We are here, no need to move.
+          console.log('deleting!');
+          delete creep.memory._move;
+        }
+      }
     } else {
+      console.log('moving??');
       creep.moveTo(source, { visualizePathStyle: { stroke: this.myColor } });
     }
 
