@@ -7,8 +7,6 @@ module.exports = {
   action() {
     const { creep } = this;
 
-    this.keepAwayFromEnemies();
-
     // Find my creeps that are hurt. If they're hurt, heal them.
     // If there aren't any hurt, we're going to try and get the healers
     // to tick near the guards, so that they're close by when the battle starts
@@ -16,15 +14,16 @@ module.exports = {
       filter(t) { return t.hits < t.hitsMax; },
     });
 
-    if (target) {
-      if (creep.pos.isNearTo(target)) {
-        creep.say('💉 Healing');
-        creep.heal(target);
-      } else {
-        creep.moveTo(target);
-      }
-    } else {
+    if (!target) {
       this.rest();
+      return;
+    }
+
+    if (creep.pos.isNearTo(target)) {
+      creep.say('💉 Healing');
+      creep.heal(target);
+    } else {
+      creep.moveTo(target);
     }
   },
 };
