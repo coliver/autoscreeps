@@ -4,7 +4,14 @@ const spawner = require('spawner');
 const messageManager = require('messageManager');
 const towerManager = require('towerManager');
 
+// const profiler = require('screeps-profiler');
+// // This line monkey patches the global prototypes.
+// profiler.enable();
+
 module.exports.loop = () => {
+  // profiler.wrap(() => {
+
+  // Main.js logic should go here.
   // cleanup dead Screeps
   if (Memory.creeps) {
     Object.keys(Memory.creeps).forEach((key) => {
@@ -13,7 +20,6 @@ module.exports.loop = () => {
       }
     });
   }
-
   // MAIN
   if (Game.rooms) {
     Object.keys(Game.rooms).forEach((key) => {
@@ -30,4 +36,5 @@ module.exports.loop = () => {
   performRoles(Game.creeps);
   factory.buildArmyWhileIdle();
   messageManager.showMessages();
+  // });
 };
