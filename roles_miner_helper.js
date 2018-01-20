@@ -6,8 +6,8 @@
 // const helper = {
 module.exports = {
   parts: [
-    [MOVE, CARRY, MOVE, CARRY],
-    [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
+    [CARRY, CARRY, MOVE, MOVE],
+    [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
     // [MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY],
   ],
 
@@ -63,10 +63,8 @@ module.exports = {
         creep.say('💼 pickup');
       }
     } else {
-      // console.log(`  moving to ${target.name}`);
-      creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+      this.travelTo(target);
     }
-    this.placeRoad();
   },
 
   assignMiner() {
@@ -210,7 +208,7 @@ module.exports = {
         }
       } else if (miner.memory.isNearSource) {
         // console.log(`  moving to ${miner}`);
-        creep.moveTo(miner, { reusePath: 25, visualizePathStyle: { stroke: this.myColor, opacity: 0.5 } });
+        this.travelTo(miner);
         return true;
       }
     }

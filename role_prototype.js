@@ -6,6 +6,7 @@ const proto = {
    */
   creep: null,
 
+  myColor: null,
   /**
    * Set the creep for this role
    *
@@ -27,6 +28,22 @@ const proto = {
     this.action(this.creep);
 
     if (this.creep.ticksToLive === 1) { this.beforeAge(); }
+  },
+
+  travelTo(target, options = {}) {
+    const { creep } = this;
+
+    const moveOptions = options;
+
+    moveOptions.visualizePathStyle = moveOptions.visualizePathStyle || { stroke: this.myColor };
+    if (moveOptions.ignoreCreeps === undefined) {
+      moveOptions.ignoreCreeps = false;
+    }
+    if (creep.memory._move) {
+      // console.log(`${creep} using noPathfinding!`);
+      moveOptions.noPathFinding = true;
+    }
+    return creep.moveTo(target, moveOptions);
   },
 
   placeRoad() {
@@ -96,6 +113,9 @@ const proto = {
 
   beforeAge() { },
 
+  isFull() {
+    return _.sum(this.creep.carry) === this.creep.carryCapacity;
+  },
   /**
    * All credit goes to Djinni
    * @url https://bitbucket.org/Djinni/screeps/
@@ -134,8 +154,7 @@ const proto = {
       distance -= 1;
     }
     if (creep.pos.findPathTo(restTarget).length > distance) {
-      // TODO: Use 'my color' here
-      creep.moveTo(restTarget, { visualizePathStyle: { stroke: '#ffaa00' } });
+      this.travelTo(restTarget);
     }
   },
 
@@ -166,7 +185,9 @@ const proto = {
       // console.log("RUN AWAY")
       const moveToX = (creep.pos.x + creep.pos.x) - target.pos.x;
       const moveToY = (creep.pos.y + creep.pos.y) - target.pos.y;
-      creep.moveTo(moveToX, moveToY, { visualizePathStyle: { stroke: '#ffaa00' } });
+      const pos = new RoomPosition(moveToX, moveToY, target.room.name);
+
+      this.travelTo(pos);
     }
   },
 
@@ -177,16 +198,16 @@ const proto = {
   kite(target) {
     const { creep } = this;
     if (!target) { return null; }
+
     if (target.pos.inRangeTo(creep.pos, 2)) {
       const moveToX = (creep.pos.x + creep.pos.x) - target.pos.x;
       const moveToY = (creep.pos.y + creep.pos.y) - target.pos.y;
-      creep.moveTo(moveToX, moveToY, { visualizePathStyle: { stroke: '#ffaa00' } });
-      return true;
+      const pos = new RoomPosition(moveToX, moveToY, target.room.name);
+      return this.travelTo(pos);
     } else if (target.pos.inRangeTo(creep.pos, 3)) {
       return true;
     }
-    creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
-    return true;
+    return this.travelTo(target);
   },
 
   getRangedTarget() {

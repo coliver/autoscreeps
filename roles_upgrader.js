@@ -32,7 +32,7 @@ const upgrader = {
         return;
       }
       // console.log(`moving to ${creep.room.controller}`)
-      creep.moveTo(creep.room.controller, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+      this.travelTo(creep.room.controller);
       return;
     }
 
@@ -67,7 +67,8 @@ const upgrader = {
         return;
       }
       // console.log(`moving to ${target}`);
-      creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+      this.travelTo(target);
+
       return;
     }
 
@@ -76,7 +77,7 @@ const upgrader = {
       creep.harvest(sources[0]);
     } else {
       // console.log(`moving to ${sources[0]}`)
-      creep.moveTo(sources[0], { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+      this.travelTo(sources[0]);
     }
   },
 };

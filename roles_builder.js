@@ -11,6 +11,24 @@ module.exports = {
 
   myColor: '#00ff11',
 
+  // There should be at least 1 builder working on roads
+  onSpawn() {
+    // TODO: make the spawner or factory care about this
+    const type = 'builder';
+    const builders = _.filter(Game.creeps, { memory: { role: type } });
+    if (builders.length < 2) {
+      return;
+    }
+
+    const roadWorkers = _.filter(builders, { memory: { isRoadWorker: true } });
+
+    if (roadWorkers.length > 0) {
+      return;
+    }
+
+    this.creep.memory.isRoadWorker = true;
+  },
+
   action() {
     const { creep } = this;
     // console.log(`this.creep: ${this.creep.name}`);
@@ -44,7 +62,7 @@ module.exports = {
     const target = this.sortByProgress(sites)[0];
 
     if (!creep.pos.isNearTo(target)) {
-      creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+      this.travelTo(target);
       return true;
     }
     creep.say(`⚒️ ${target.structureType}`);
@@ -96,7 +114,7 @@ module.exports = {
       if (creep.pos.isNearTo(target)) {
         creep.withdraw(target, RESOURCE_ENERGY);
       } else {
-        creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+        this.travelTo(target);
       }
       return;
     }
@@ -108,7 +126,7 @@ module.exports = {
         creep.pickup(energy);
         return;
       }
-      creep.moveTo(energy, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+      this.travelTo(energy);
       return;
     }
 
@@ -118,24 +136,13 @@ module.exports = {
         creep.say('🔄 harvest');
         creep.harvest(source);
       } else {
-        creep.moveTo(source, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+        this.travelTo(source);
       }
     }
   },
 
   findATarget() {
-    const target = this.closestThingWithEnergy();
-
-    if (target) {
-      return target;
-    }
-
-    // const closestSpawn = this.creep.pos.findClosestByRange(FIND_MY_SPAWNS);
-    // if (closestSpawn.energy > 250) {
-    //   target = closestSpawn;
-    // }
-
-    return target;
+    return this.closestThingWithEnergy();
   },
 
   checkRamparts() {
@@ -158,7 +165,7 @@ module.exports = {
         creep.repair(damagedRamparts[0]);
         return true;
       }
-      creep.moveTo(damagedRamparts[0], { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+      this.travelTo(damagedRamparts[0]);
       return true;
     }
     return false;
@@ -171,7 +178,9 @@ module.exports = {
     // health, and we'll go to repair those. We set it at 50%, because we
     // don't want builders abandoning their duty every time a road gets walked on
     const toRepair = creep.room.find(FIND_MY_STRUCTURES, {
-      filter: structure => (structure.hits / structure.hitsMax) < 0.5 && structure.structureType !== STRUCTURE_RAMPART,
+      filter: structure =>
+        ((structure.hits / structure.hitsMax) < 0.5) &&
+        (structure.structureType !== STRUCTURE_RAMPART),
     });
 
     if (toRepair.length === 0) { return false; }
@@ -183,8 +192,7 @@ module.exports = {
       creep.repair(structure);
       return true;
     }
-
-    creep.moveTo(structure, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+    this.travelTo(structure);
     return true;
   },
 
@@ -196,7 +204,7 @@ module.exports = {
 
     if (target) {
       if (!creep.pos.inRangeTo(target, 3)) {
-        creep.moveTo(target, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
+        this.travelTo(target);
         return true;
       }
       creep.say(`⚒️ ${target.structureType}`);
@@ -222,6 +230,7 @@ module.exports = {
   },
 
   findWallSites() {
+    // console.log('findWallSites()');
     return this.findConstructionSites(STRUCTURE_WALL);
   },
 
@@ -267,16 +276,13 @@ module.exports = {
       },
     });
 
-    if (repairit) {
-      if (!creep.pos.inRangeTo(repairit, 3)) {
-        creep.moveTo(repairit, { reusePath: 25, visualizePathStyle: { stroke: this.myColor } });
-        return true;
-      }
-      // creep.say('🛠️ repair');
-      creep.repair(repairit);
+    if (!repairit) { return false; }
+
+    if (!creep.pos.inRangeTo(repairit, 3)) {
+      this.travelTo(repairit);
       return true;
     }
-    return false;
+    return creep.repair(repairit);
   },
 
   sortByProgress(sites) {
