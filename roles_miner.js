@@ -6,9 +6,9 @@ const miner = {
   myColor: '#ffaa00',
 
   parts: [
-    [MOVE, WORK, WORK],
-    [MOVE, WORK, WORK, WORK, WORK],
-    [MOVE, WORK, WORK, WORK, WORK, WORK],
+    [MOVE, MOVE, WORK, WORK],
+    // [MOVE, WORK, WORK, WORK],
+    // [MOVE, WORK, WORK, WORK, WORK, WORK],
   ],
 
   action() {
@@ -27,31 +27,52 @@ const miner = {
       return;
     }
 
-    creep.memory.isNearSource = creep.pos.inRangeTo(source, 5);
+    if (!creep.memory.isNearSource) {
+      creep.memory.isNearSource = creep.pos.inRangeTo(source, 5);
+    }
 
     if (Memory.sources[source.id] == null) {
       Memory.sources[source.id] = { id: source.id };
     }
     Memory.sources[source.id].miner = creep.id;
 
-    // If we are near a source, make a container.
-    if (creep.pos.isNearTo(source)) {
-      // TODO: Check if the miner is on top of a container first
-      creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
-      if (creep.harvest(source) === OK) {
-        if (creep.memory._move) {
-          // We are here, no need to move.
-          console.log('deleting!');
-          delete creep.memory._move;
-        }
-      }
-    } else {
-      console.log('moving??');
-      creep.moveTo(source, { visualizePathStyle: { stroke: this.myColor } });
+    if (!creep.memory.isNextToSource && !creep.pos.isNearTo(source)) {
+      creep.memory.isNextToSource = false;
+      this.travelTo(source);
+      this.keepAwayFromEnemies();
+      return;
     }
 
-    this.placeRoad();
-    this.keepAwayFromEnemies();
+    creep.memory.isNextToSource = true;
+
+    // If we are near a source, make a container.
+    if (!creep.memory.containerSiteBuilt) {
+      const ret = creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
+
+      switch (ret) {
+        case OK:
+        case ERR_INVALID_TARGET:
+          creep.memory.containerSiteBuilt = true;
+          break;
+        case ERR_FULL:
+          // TODO: Kill a road or something and build this instead.
+          break;
+        case ERR_INVALID_ARGS:
+          throw new Error(`Invalid args: creep.room.createConstructionSite(${creep.pos}, STRUCTURE_CONTAINER);`);
+        case ERR_RCL_NOT_ENOUGH:
+          throw new Error(`RCL not high enough: creep.room.createConstructionSite(${creep.pos}, STRUCTURE_CONTAINER);`);
+        default:
+          throw new Error(`Unexpected return value from: createConstructionSite(${creep.pos}, STRUCTURE_CONTAINER); Return value: ${ret}`);
+      }
+    }
+    if (creep.harvest(source) === OK) {
+      creep.memory.isNextToSource = true;
+      if (creep.memory._move) {
+        // We are here, no need to move.
+        console.log('deleting!');
+        delete creep.memory._move;
+      }
+    }
   },
 
   beforeAge() {
