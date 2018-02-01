@@ -9,6 +9,22 @@ const transporter = {
 
   onSpawn() {
     this.creep.memory.mode = 'pickup';
+
+    // TODO: make the spawner or factory care about this
+    const type = 'transporter';
+    const creeps = _.filter(Game.creeps, { memory: { role: type } });
+    if (creeps.length <= 1) {
+      return;
+    }
+
+    const runners = _.filter(creeps, { memory: { isAmmoRunner: true } });
+
+    if (runners.length > 0) {
+      return;
+    }
+
+    this.creep.memory.isAmmoRunner = true;
+    console.log(`${this.creep.name} is an ammo runner.`);
   },
 
   action() {
@@ -102,9 +118,14 @@ const transporter = {
 
     // PICKUP MODE DA GREATEST
     // Try finding a needful buddy
-    target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-      filter: builder => (builder.memory.role === 'builder' || builder.memory.role === 'upgrader') && (_.sum(builder.carry) < (creep.carryCapacity)),
-    }) || this.checkExtensions() || this.checkTowers();
+    if (creep.memory.isAmmoRunner) {
+      console.log('AMMOOOOOSSS');
+      target = this.checkTowers();
+    } else {
+      target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+        filter: builder => (builder.memory.role === 'builder' || builder.memory.role === 'upgrader') && (_.sum(builder.carry) < (creep.carryCapacity)),
+      }) || this.checkExtensions() || this.checkTowers();
+    }
 
     if (!target) {
       // console.log('  use a spawn');

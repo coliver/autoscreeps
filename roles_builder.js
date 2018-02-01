@@ -47,7 +47,29 @@ module.exports = {
       this.checkRepairs() ||
       this.checkConstructionSites() ||
       this.fixBrokenWalls() ||
-      this.findRoadSite();
+      this.findRoadSite() ||
+      this.fillExtensions();
+  },
+
+  // TODO: Thie is c+p'd everywhere. centralize it
+  fillExtensions() {
+    const { creep } = this;
+    // console.log("  checkExtensions")
+    const extensions = this.creep.room.find(FIND_MY_STRUCTURES, {
+      filter: structure => (structure.structureType === STRUCTURE_EXTENSION) &&
+                           (structure.energy < structure.energyCapacity),
+    });
+    if (!extensions) { return null; }
+    const target = this.creep.pos.findClosestByRange(extensions);
+    if (creep.pos.isNearTo(target)) {
+      const ret = creep.transfer(target, RESOURCE_ENERGY);
+      if (ret !== OK) {
+        // console.log(`  dropping nrg`);
+        return creep.drop(RESOURCE_ENERGY);
+      }
+      return ret;
+    }
+    return this.travelTo(target);
   },
 
   findRoadSite() {
@@ -55,6 +77,8 @@ module.exports = {
     const { creep } = this;
 
     if (!sites) {
+      // check Memory for where roads should be
+
       // No roads? No road workers.
       creep.memory.isRoadWorker = false;
       return false;
@@ -270,19 +294,28 @@ module.exports = {
   fixBrokenWalls() {
     const { creep } = this;
     const max = this.wallRepairMax();
-    const repairit = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+    // const repairit = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+    //   filter(structure) {
+    //     return structure.structureType === STRUCTURE_WALL && structure.hits < max;
+    //   },
+    // });
+
+    const walls = creep.room.find(FIND_STRUCTURES, {
       filter(structure) {
         return structure.structureType === STRUCTURE_WALL && structure.hits < max;
       },
     });
+    if (!walls) { return false; }
 
-    if (!repairit) { return false; }
+    const sortedWalls = walls.sort((a, b) => a.hits - b.hits);
+    // console.log(JSON.stringify(sortedWalls[0]));
+    const repairit = sortedWalls[0];
 
-    if (!creep.pos.inRangeTo(repairit, 3)) {
+    if (creep.repair(repairit) === ERR_NOT_IN_RANGE) {
       this.travelTo(repairit);
       return true;
     }
-    return creep.repair(repairit);
+    return false;
   },
 
   sortByProgress(sites) {
@@ -293,10 +326,15 @@ module.exports = {
   },
 
   wallRepairMax() {
-    return (Game.gcl.level * 10000) || 0;
+    const { creep } = this;
+    const controllerLevel = creep.room.controller.level;
+    return (controllerLevel * 100000) || 0;
   },
 
   rampartRepairMax() {
-    return 3000000 * (Game.gcl.level * 0.15);
+    const { creep } = this;
+    const controllerLevel = creep.room.controller.level;
+
+    return 100000 * controllerLevel;
   },
 };

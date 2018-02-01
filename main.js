@@ -21,6 +21,7 @@ module.exports.loop = () => {
   // MAIN
   if (Game.rooms) {
     Object.keys(Game.rooms).forEach((key) => {
+      // console.log(key);
       factory.theRoom = Game.rooms[key];
       factory.init();
       factory.run();
@@ -30,12 +31,12 @@ module.exports.loop = () => {
 
       // TODO: Find a place for this.
       // build roads maybe
-      if (Memory.rooms[key].ticksToBuild === undefined) { Memory.rooms[key].ticksToBuild = 500; }
 
-      if (Memory.rooms[key].ticksToBuild <= 0) {
-        // console.log('BUILD ALL THE ROADS');
+      if (((Memory.rooms[key] || {}).ticksToBuild || 0) <= 0) {
         const construction = require('constructionPlanner');
         construction.theRoom = Game.rooms[key];
+        Memory.rooms[key] = {};
+        Memory.rooms[key].roadSites = [];
         construction.buildRoadsToAllSources();
         Memory.rooms[key].ticksToBuild = 500;
       } else {

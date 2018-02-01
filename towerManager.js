@@ -7,6 +7,11 @@ const towerManager = {
     });
 
     _.forEach(towers, (tower) => {
+      const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+      if (closestHostile) {
+        tower.attack(closestHostile);
+      }
+
       const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: (structure) => {
           switch (structure.structureType) {
@@ -19,11 +24,6 @@ const towerManager = {
       });
       if (closestDamagedStructure) {
         tower.repair(closestDamagedStructure);
-      }
-
-      const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-      if (closestHostile) {
-        tower.attack(closestHostile);
       }
     });
   },
