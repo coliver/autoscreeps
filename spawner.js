@@ -72,8 +72,8 @@ const spawner = {
   },
 
   canSpawn(spawnPoint, role) {
-    console.log(`          Room capacity ${spawnPoint.room.energyAvailable} / ${spawnPoint.room.energyCapacityAvailable}`);
-    console.log(`        this.spawnCost(${role}) ${this.spawnCost(role)}`);
+    // console.log(`          Room capacity ${spawnPoint.room.energyAvailable} / ${spawnPoint.room.energyCapacityAvailable}`);
+    // console.log(`        this.spawnCost(${role}) ${this.spawnCost(role)}`);
 
     const cost = this.spawnCost(role);
 

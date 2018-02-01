@@ -5,12 +5,10 @@ const messageManager = require('messageManager');
 const towerManager = require('towerManager');
 
 // const profiler = require('screeps-profiler');
-// // This line monkey patches the global prototypes.
 // profiler.enable();
 
 module.exports.loop = () => {
   // profiler.wrap(() => {
-
   // Main.js logic should go here.
   // cleanup dead Screeps
   if (Memory.creeps) {
@@ -23,12 +21,27 @@ module.exports.loop = () => {
   // MAIN
   if (Game.rooms) {
     Object.keys(Game.rooms).forEach((key) => {
+      // console.log(key);
       factory.theRoom = Game.rooms[key];
       factory.init();
       factory.run();
 
       towerManager.theRoom = Game.rooms[key];
       towerManager.manageTowers();
+
+      // TODO: Find a place for this.
+      // build roads maybe
+
+      if (((Memory.rooms[key] || {}).ticksToBuild || 0) <= 0) {
+        const construction = require('constructionPlanner');
+        construction.theRoom = Game.rooms[key];
+        Memory.rooms[key] = {};
+        Memory.rooms[key].roadSites = [];
+        construction.buildRoadsToAllSources();
+        Memory.rooms[key].ticksToBuild = 500;
+      } else {
+        Memory.rooms[key].ticksToBuild -= 1;
+      }
     });
   }
 
